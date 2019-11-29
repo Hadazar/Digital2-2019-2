@@ -22,9 +22,10 @@ Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,he
 Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=getOpcode).place(x=17+115+17,y=17)
 
 #Código MIPS ---------------------------
-CodigoMips = Text(ventana,width=95,height=15, padx = 10, pady = 10).place(x=17,y=100)
-#CodigoMips.pack()
+CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
+CodigoMips.place(x=17,y=100)
 CodigoMips.insert(END,"Escriba aquí su código Mips...")
+#CodigoMips.pack()
 
 #Estado del programa --------------------
 Estatus = 'Compilando...'
