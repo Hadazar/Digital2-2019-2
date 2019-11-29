@@ -22,11 +22,15 @@ def getOpcode():
 
 def capturarCodigo():
     Codigo = CodigoMips.get(1.0,END)
-    print("Codigo: ", Codigo)
+    print("Codigo: \n", Codigo)
+
+def borrar():
+    CodigoMips.delete(1.0,END)
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
 Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=getOpcode).place(x=17+115+17,y=17)
+BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
 
 #Código MIPS ---------------------------
 CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
