@@ -20,8 +20,10 @@ Tabla = open("InstruccionesMIPS","r")
 SetInstrucciones = Tabla.read()
 TablaR = open("InstruccionesTipoR","r")
 SetInstruccionesR = Tabla.read()
-BancoRegistros = open("BancoDeregistros","r")
+BancoRegistros = open("BancoDeRegistros","r")
 Registros = BancoRegistros.read()
+CodigoEjemplo = open("Ejemplo","r")
+Ejemplo = CodigoEjemplo.read()
 
 Codigo = StringVar()
 
@@ -35,6 +37,37 @@ def capturarCodigo():
 
 def borrar():
     CodigoMips.delete(1.0,END)
+
+"""
+def convetirAmatriz(Texto):
+    Matriz = []
+    n = len(Texto)
+    Fila = []
+    Palabra = ''
+    for i in range(0,n-1):
+        Letra = Texto[i]
+        if Letra == ' ' or Letra == ',':
+            Fila.append(Palabra)
+        elif Letra == '\n':
+            Matriz.append(Fila)
+        else:
+            Palabra.append(Letra)
+    return Matriz
+"""
+
+def convetirAmatriz(Texto):
+    Lista = Texto.split("\n")
+    n = len(Lista)
+    Matriz = [None] * n
+    for i in range(0,n-1):
+        SinComas = Lista[i].replace(",","")
+        Matriz[i] = SinComas.split(" ")
+    return Matriz
+
+def imprimir(Matriz):
+    for i in Matriz:
+        print(i)
+
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
@@ -50,5 +83,8 @@ CodigoMips.insert(END,"Escriba aquí su código Mips...")
 Estatus = 'Compilando...'
 EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=400)
 Estado = Label(ventana, text = Estatus,width=95,height=5, bg = "black", fg = "white").place(x=17,y=450)
+
+
+imprimir(convetirAmatriz(Ejemplo))
 
 ventana.mainloop() #Corre la ventana
