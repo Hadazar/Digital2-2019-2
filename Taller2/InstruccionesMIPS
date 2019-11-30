@@ -1,0 +1,5 @@
+bltz 000001 rs label
+j 000010 label
+jal 000011 label
+
+
