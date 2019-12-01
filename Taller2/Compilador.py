@@ -16,9 +16,9 @@ AnchoBoton=11
 AltoBoton=3
 
 #Tablas de instrucciones y registros MIPS
-Tabla = open("InstruccionesMIPS","r")
+Tabla = open("InstruccionesMIPS","r")#Instrucciones tipo I y J
 SetInstrucciones = Tabla.read()
-TablaR = open("InstruccionesTipoR","r")
+TablaR = open("InstruccionesTipoR","r")#Instrucciones tipo R
 SetInstruccionesR = TablaR.read()
 BancoRegistros = open("BancoDeRegistros","r")
 Registros = BancoRegistros.read()
@@ -38,7 +38,7 @@ def convertirAmatriz(Texto):
 
 #MatrizCodigo = ""
 MatrizCodigo = convertirAmatriz(Ejemplo)
-Labels = {}
+Labels = {} #Se crea como un diccionario
 BancoRegistros = Registros.split(" ")
 DireccionBase = 0x00400000
 
@@ -47,34 +47,18 @@ def capturarLabels():
     n = len(MatrizCodigo)
     for i in range(0,n-1):
         if MatrizCodigo[i][0][-1] == ":":
-            Labels[MatrizCodigo[i][0]] = DireccionBase+i*4
-            """
-            label = []
-            label.append(MatrizCodigo[i][0])
-            label.append(hex(DireccionBase+i*4))
-            Labels.append(label)
-            """
+            label = MatrizCodigo[i][0].replace(":","")
+            Labels[label] = DireccionBase+i*4
             MatrizCodigo.pop(i)
-
-def buscarLabel(label):
-    Direccion = None
-    for i in range(len(Labels)):
-        if Labels[i][0] == label:
-            Direccion = Labels[i][1]
-    return Direccion
 
 def getOpcode():
     #print("Opcode: \n")
     #print(SetInstrucciones)
-    print(MatrizCodigo)
-    print("\n\n")
     capturarLabels()
-    print(MatrizCodigo)
+    imprimir(MatrizCodigo)
     print("\n\n")
-    print(Labels)
-    print("\n\n")
-    print(Labels["L1:"])
-
+    compilar()
+    
 def capturarCodigo():
     global MatrizCodigo
     Codigo = CodigoMips.get(1.0,END)
@@ -99,7 +83,7 @@ def buscarRegistro(Registro):
 
 
 def buscarInstruccion(Matriz, Instruccion):
-    EstructuraInstruccion = ""
+    EstructuraInstruccion = None
     for i in range(len(Matriz)):
         if Instruccion == Matriz[i][0]:
             EstructuraInstruccion = Matriz[i]
@@ -124,143 +108,140 @@ Estatus = 'Compilando...'
 EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=400)
 Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=450)
 
-"""
-opcode
-rs
-rt
-rd
-shamt
-func
-imm
-addr
-tipo
-"""
-"""
+def compilar():
+    Opcode, rs, rt, rd, Shamt, Func, imm, addr = 0,0,0,0,0,0,0,0
+    n = len(MatrizCodigo)
 
-for i in range(len(MatrizCodigo)):
-    Instruccion = MatrizCodigo[i][0]
-    Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion)
-    TipoR = False
-    Tipo = Estructura[2]
-    if Estructura == "":
-        Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion)
-        TipoR = True
-    
-    #Instruccion tipo R
-    if TipoR == True:
+    for i in range(len(MatrizCodigo)):
 
-        Opcode = 0
-        Func = int(Estructura[1])
+        Instruccion = MatrizCodigo[i]
+        InstruccionHexa = ""
+        Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion[0])
+        TipoR = False
 
-        #Tipo R1
-        if Tipo == "R1":
-            rd = buscarRegistro(Instruccion[1]) 
-            rs = buscarRegistro(Instruccion[2]) 
-            rt = buscarRegistro(Instruccion[3])
-            Shamt = 0
+         #Si no las encuentra en la lista de tipo I y J entonces las busva en la lista tipoR
+        if Estructura == None:
+            print("buscando en R")
+            Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion[0])
+            TipoR = True
 
-        #Tipo R2
-        elif Tipo == "R2":
-            rd = buscarRegistro(Instruccion[1]) 
-            rt = buscarRegistro(Instruccion[2]) 
-            rs = buscarRegistro(Instruccion[3])
-            Shamt = 0
+        Tipo = Estructura[2]
+        print("Tipo: ", Tipo)
 
-        #Tipo R3
-        elif Tipo == "R3":
-            rd = buscarRegistro(Instruccion[1]) 
-            rt = buscarRegistro(Instruccion[2]) 
-            Shamt = buscarRegistro(Instruccion[3])
-            rs = 0
+       
+        
+        #Instruccion tipo R
+        if TipoR == True:
 
-        #Tipo R4
-        elif Tipo == "R4":
-            rs = buscarRegistro(Instruccion[1])
-            rt = 0
-            rd = 0
-            shamt = 0
+            Opcode = 0
+            Func = int(Estructura[1])
 
-        #Tipo R5
-        elif Tipo == "R5":
-            rd = buscarRegistro(Instruccion[1])
-            rt = 0
-            rs = 0
-            shamt = 0
+            #Tipo R1
+            if Tipo == "R1":
+                rd = buscarRegistro(Instruccion[1]) 
+                rs = buscarRegistro(Instruccion[2]) 
+                rt = buscarRegistro(Instruccion[3])
+                Shamt = 0
 
-        #Tipo R6
-        elif Tipo == "R6":
-            rs = buscarRegistro(Instruccion[1])
-            rt = buscarRegistro(Instruccion[2])
-            rd = 0
-            shamt = 0
+            #Tipo R2
+            elif Tipo == "R2":
+                rd = buscarRegistro(Instruccion[1]) 
+                rt = buscarRegistro(Instruccion[2]) 
+                rs = buscarRegistro(Instruccion[3])
+                Shamt = 0
 
-    #Instruccion tipo I o J
-    elif TipoR == False:
+            #Tipo R3
+            elif Tipo == "R3":
+                rd = buscarRegistro(Instruccion[1]) 
+                rt = buscarRegistro(Instruccion[2]) 
+                Shamt = buscarRegistro(Instruccion[3])
+                rs = 0
 
-        Opcode = int(Estructura[1])
+            #Tipo R4
+            elif Tipo == "R4":
+                rs = buscarRegistro(Instruccion[1])
+                rt = 0
+                rd = 0
+                shamt = 0
 
-        #Tipo J
-        if Tipo == "J":
-            addr = Instruccion[1]
+            #Tipo R5
+            elif Tipo == "R5":
+                rd = buscarRegistro(Instruccion[1])
+                rt = 0
+                rs = 0
+                shamt = 0
 
-        #Tipo I1
-        elif Tipo == "I1":
-            rt = buscarRegistro(Instruccion[1])
-            rs = buscarRegistro(Instruccion[2])
-            imm = Instruccion[3]
+            #Tipo R6
+            elif Tipo == "R6":
+                rs = buscarRegistro(Instruccion[1])
+                rt = buscarRegistro(Instruccion[2])
+                rd = 0
+                shamt = 0
 
-        #Tipo I2
-        elif Tipo == "I2":
-            rt = buscarRegistro(Instruccion[1])
-            imm = Instruccion[2]
-            rs = buscarRegistro(Instruccion[3])
+            print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
 
-        #Tipo I3
-        elif Tipo == "I3":
-            rs = buscarRegistro(Instruccion[1])
-            #label
-            rt = Estructura[3]
+        #Instruccion tipo I o J
+        elif TipoR == False:
 
-        #Tipo I4
-        elif Tipo == "I4":
-            rs = buscarRegistro(Instruccion[1])
-            rt = buscarRegistro(Instruccion[2])
-            #label
+            Opcode = int(Estructura[1])
+            TipoJ = False
+            #Tipo J
+            if Tipo == "J":
+                addr = Instruccion[1]
+                TipoJ = True
 
-        #Tipo I5
-        elif Tipo == "I5":
-            rt = buscarRegistro(Instruccion[1])
-            imm = Instruccion[2]
-            rs = 0
+            #Tipo I1
+            elif Tipo == "I1":
+                rt = buscarRegistro(Instruccion[1])
+                rs = buscarRegistro(Instruccion[2])
+                imm = Instruccion[3]
 
-        #Tipo I6
-        elif Tipo == "I6":
-            rt = buscarRegistro(Instruccion[1])
-            rd = buscarRegistro(Instruccion[2])
-            rs = Estructura[3]
+            #Tipo I2
+            elif Tipo == "I2":
+                rt = buscarRegistro(Instruccion[1])
+                imm = Instruccion[2]
+                rs = buscarRegistro(Instruccion[3])
 
-        #Tipo I7
-        elif Tipo == "I7":
-            #label
-            rt = Estructura[3]
-            rs = 0
+            #Tipo I3
+            elif Tipo == "I3":
+                rs = buscarRegistro(Instruccion[1])
+                imm = Labels[Instruccion[2]]
+                rt = Estructura[3]
 
-"""
+            #Tipo I4
+            elif Tipo == "I4":
+                rs = buscarRegistro(Instruccion[1])
+                rt = buscarRegistro(Instruccion[2])
+                imm = Labels[Instruccion[3]]
+
+            #Tipo I5
+            elif Tipo == "I5":
+                rt = buscarRegistro(Instruccion[1])
+                imm = Instruccion[2]
+                rs = 0
+
+            #Tipo I6
+            elif Tipo == "I6":
+                rt = buscarRegistro(Instruccion[1])
+                rd = buscarRegistro(Instruccion[2])
+                rs = Estructura[3]
+
+            #Tipo I7
+            elif Tipo == "I7":
+                imm = Labels[Instruccion[1]]
+                rt = Estructura[3]
+                rs = 0
+
+            if TipoJ == False:
+                print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", imm: ",imm,"\n")
+            else:
+                print("op: ",Opcode,", addr: ",rs,"\n")
+
+
 #print(buscarRegistro(MatrizRegistros, "$s5"))
 
 #imprimir(MatrizInstrucciones)
 
-"""
-def hexaAentero(Cadena):
-    Cadena = Cadena.replace("0x","")
-    return hex(Cadena)
 
-a = 0x400004
-b = str(hex(a))
-print(a)
-print(b)
-print(hexaAentero(b))
-print(hex(hexaAentero(b)))
-"""
 
 ventana.mainloop() #Corre la ventana
