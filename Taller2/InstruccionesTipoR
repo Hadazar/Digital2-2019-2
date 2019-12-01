@@ -1,5 +1,3 @@
-sll 000000
-srl 000010
-sra 000011
-sllv 000100
-srlv 000110
+srlv 6 R2
+slt 42 R1
+jr 8 R4

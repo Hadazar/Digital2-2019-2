@@ -4,3 +4,19 @@ Tipo I: op rs rt imm
 	6  5  5  16
 Tipo J: op addr
 	6  26
+
+I1: rt rs imm
+I2: rt imm rs
+I3: rs label rt=0/1
+I4: rs rt label
+I5: rt imm
+I6: rt rd rs=0/4
+I7: label rt=0/1
+
+R1: rd rs rt
+R2: rd rt rs
+R3: rd rt shamt
+R4: rs
+R5: rd
+R6: rs rt
+

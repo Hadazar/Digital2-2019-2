@@ -19,7 +19,7 @@ AltoBoton=3
 Tabla = open("InstruccionesMIPS","r")
 SetInstrucciones = Tabla.read()
 TablaR = open("InstruccionesTipoR","r")
-SetInstruccionesR = Tabla.read()
+SetInstruccionesR = TablaR.read()
 BancoRegistros = open("BancoDeRegistros","r")
 Registros = BancoRegistros.read()
 CodigoEjemplo = open("Ejemplo","r")
@@ -58,9 +58,9 @@ def imprimir(Matriz):
         print(i)
 
 #Matrices
-MatrizIntrsucciones = convertirAmatriz(SetInstrucciones)
-MatrizIntrsuccionesR = convertirAmatriz(SetInstruccionesR)
-MatrizRegistros = convertirAmatriz(Registros)
+MatrizInstrucciones = convertirAmatriz(SetInstrucciones)
+MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
+MatrizRegistros = Registros.split(" ")
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
@@ -76,6 +76,66 @@ CodigoMips.insert(END,"Escriba aquí su código Mips...")
 Estatus = 'Compilando...'
 EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=400)
 Estado = Label(ventana, text = Estatus,width=95,height=5, bg = "black", fg = "white").place(x=17,y=450)
+
+"""
+opcode
+rs
+rt
+rd
+shamt
+func
+imm
+addr
+tipo
+"""
+
+def buscarInstruccion(Matriz, Instruccion):
+    EstructuraInstruccion = ""
+    for i in range(len(Matriz)):
+        if Instruccion == Matriz[i][0]:
+            EstructuraInstruccion = Matriz[i]
+    return EstructuraInstruccion
+
+#print(buscarInstruccion(MatrizInstrucciones, "sb"))
+
+#print(MatrizInstruccionesR[1][0])
+for i in range(len(MatrizCodigo)):
+    Instruccion = MatrizCodigo[i][0]
+    Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion)
+    
+
+
+
+#imprimir(MatrizInstrucciones)
+
+#Tipo I1
+
+#Tipo I2
+
+#Tipo I3
+
+#Tipo I4
+
+#Tipo I5
+
+#Tipo I6
+
+#Tipo I7
+
+#Tipo R1
+
+#Tipo R2
+
+#Tipo R3
+
+#Tipo R4
+
+#Tipo R5
+
+#Tipo R6
+
+
+
 
 
 ventana.mainloop() #Corre la ventana
