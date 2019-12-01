@@ -1,4 +1,4 @@
 addi 8 I1
 andi 12 I1
 sb 40 I2
-bgez I3 1
+bgez 1 I3 1

@@ -57,6 +57,14 @@ def imprimir(Matriz):
     for i in Matriz:
         print(i)
 
+def buscarRegistro(BancoRegistros, Registro):
+    NumeroRegistro = None
+    for i in range(len(BancoRegistros)):
+        if Registro == BancoRegistros[i]:
+            NumeroRegistro = i
+            break
+    return NumeroRegistro
+
 #Matrices
 MatrizInstrucciones = convertirAmatriz(SetInstrucciones)
 MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
@@ -96,43 +104,119 @@ def buscarInstruccion(Matriz, Instruccion):
             EstructuraInstruccion = Matriz[i]
     return EstructuraInstruccion
 
-#print(buscarInstruccion(MatrizInstrucciones, "sb"))
-
-#print(MatrizInstruccionesR[1][0])
 for i in range(len(MatrizCodigo)):
     Instruccion = MatrizCodigo[i][0]
     Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion)
+    TipoR = False
+    Tipo = Estructura[2]
+    if Estructura == "":
+        Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion)
+        TipoR = True
     
+    #Instruccion tipo R
+    if TipoR == True:
+
+        Opcode = 0
+        Func = int(Estructura[1])
+
+        #Tipo R1
+        if Tipo == "R1":
+            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
+            rs = buscarRegistro(MatrizRegistros,Instruccion[2]) 
+            rt = buscarRegistro(MatrizRegistros,Instruccion[3])
+            Shamt = 0
+
+        #Tipo R2
+        elif Tipo == "R2":
+            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
+            rt = buscarRegistro(MatrizRegistros,Instruccion[2]) 
+            rs = buscarRegistro(MatrizRegistros,Instruccion[3])
+            Shamt = 0
+
+        #Tipo R3
+        elif Tipo == "R3":
+            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
+            rt = buscarRegistro(MatrizRegistros,Instruccion[2]) 
+            Shamt = buscarRegistro(MatrizRegistros,Instruccion[3])
+            rs = 0
+
+        #Tipo R4
+        elif Tipo == "R4":
+            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = 0
+            rd = 0
+            shamt = 0
+
+        #Tipo R5
+        elif Tipo == "R5":
+            rd = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = 0
+            rs = 0
+            shamt = 0
+
+        #Tipo R6
+        elif Tipo == "R6":
+            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rd = 0
+            shamt = 0
+
+    #Instruccion tipo I o J
+    elif TipoR == False:
+
+        Opcode = int(Estructura[1])
+
+        #Tipo J
+        if Tipo == "J":
+            addr = Instruccion[1]
+
+        #Tipo I1
+        elif Tipo == "I1":
+            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rs = buscarRegistro(MatrizRegistros,Instruccion[2])
+            imm = Instruccion[3]
+
+        #Tipo I2
+        elif Tipo == "I2":
+            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            imm = Instruccion[2]
+            rs = buscarRegistro(MatrizRegistros,Instruccion[3])
+
+        #Tipo I3
+        elif Tipo == "I3":
+            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            #label
+            rt = Estructura[3]
+
+        #Tipo I4
+        elif Tipo == "I4":
+            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = buscarRegistro(MatrizRegistros,Instruccion[2])
+            #label
+
+        #Tipo I5
+        elif Tipo == "I5":
+            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            imm = Instruccion[2]
+            rs = 0
+
+        #Tipo I6
+        elif Tipo == "I6":
+            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rd = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rs = Estructura[3]
+
+        #Tipo I7
+        elif Tipo == "I7":
+            #label
+            rt = Estructura[3]
+            rs = 0
 
 
+#print(buscarRegistro(MatrizRegistros, "$s5"))
 
 #imprimir(MatrizInstrucciones)
 
-#Tipo I1
-
-#Tipo I2
-
-#Tipo I3
-
-#Tipo I4
-
-#Tipo I5
-
-#Tipo I6
-
-#Tipo I7
-
-#Tipo R1
-
-#Tipo R2
-
-#Tipo R3
-
-#Tipo R4
-
-#Tipo R5
-
-#Tipo R6
 
 
 
