@@ -25,12 +25,55 @@ Registros = BancoRegistros.read()
 CodigoEjemplo = open("Ejemplo","r")
 Ejemplo = CodigoEjemplo.read()
 
-MatrizCodigo = ""
+def convertirAmatriz(Texto):
+    Lista = Texto.split("\n")
+    n = len(Lista)
+    Matriz = [None] * (n-1)
+    for i in range(0,n-1):
+        Lista[i] = Lista[i].replace(",","")
+        Lista[i] = Lista[i].replace("("," ")
+        Lista[i] = Lista[i].replace(")","")
+        Matriz[i] = Lista[i].split(" ")
+    return Matriz
+
+#MatrizCodigo = ""
+MatrizCodigo = convertirAmatriz(Ejemplo)
+Labels = {}
+BancoRegistros = Registros.split(" ")
+DireccionBase = 0x00400000
+
+def capturarLabels():
+    global MatrizCodigo, Labels
+    n = len(MatrizCodigo)
+    for i in range(0,n-1):
+        if MatrizCodigo[i][0][-1] == ":":
+            Labels[MatrizCodigo[i][0]] = DireccionBase+i*4
+            """
+            label = []
+            label.append(MatrizCodigo[i][0])
+            label.append(hex(DireccionBase+i*4))
+            Labels.append(label)
+            """
+            MatrizCodigo.pop(i)
+
+def buscarLabel(label):
+    Direccion = None
+    for i in range(len(Labels)):
+        if Labels[i][0] == label:
+            Direccion = Labels[i][1]
+    return Direccion
 
 def getOpcode():
-    print("Opcode: \n")
-    print(SetInstrucciones)
-    imprimir(MatrizCodigo)
+    #print("Opcode: \n")
+    #print(SetInstrucciones)
+    print(MatrizCodigo)
+    print("\n\n")
+    capturarLabels()
+    print(MatrizCodigo)
+    print("\n\n")
+    print(Labels)
+    print("\n\n")
+    print(Labels["L1:"])
 
 def capturarCodigo():
     global MatrizCodigo
@@ -41,23 +84,12 @@ def capturarCodigo():
 def borrar():
     CodigoMips.delete(1.0,END)
 
-def convertirAmatriz(Texto):
-    Lista = Texto.split("\n")
-    n = len(Lista)
-    Matriz = [None] * (n-1)
-    for i in range(0,n-1):
-        Lista[i] = Lista[i].replace(",","")
-        Lista[i] = Lista[i].replace("("," ")
-        Lista[i] = Lista[i].replace(")","")
-        Lista[i] = Lista[i].replace(":","")
-        Matriz[i] = Lista[i].split(" ")
-    return Matriz
 
 def imprimir(Matriz):
     for i in Matriz:
         print(i)
 
-def buscarRegistro(BancoRegistros, Registro):
+def buscarRegistro(Registro):
     NumeroRegistro = None
     for i in range(len(BancoRegistros)):
         if Registro == BancoRegistros[i]:
@@ -65,10 +97,17 @@ def buscarRegistro(BancoRegistros, Registro):
             break
     return NumeroRegistro
 
+
+def buscarInstruccion(Matriz, Instruccion):
+    EstructuraInstruccion = ""
+    for i in range(len(Matriz)):
+        if Instruccion == Matriz[i][0]:
+            EstructuraInstruccion = Matriz[i]
+    return EstructuraInstruccion
+
 #Matrices
 MatrizInstrucciones = convertirAmatriz(SetInstrucciones)
 MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
-MatrizRegistros = Registros.split(" ")
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
@@ -83,7 +122,7 @@ CodigoMips.insert(END,"Escriba aquí su código Mips...")
 #Estado del programa --------------------
 Estatus = 'Compilando...'
 EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=400)
-Estado = Label(ventana, text = Estatus,width=95,height=5, bg = "black", fg = "white").place(x=17,y=450)
+Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=450)
 
 """
 opcode
@@ -96,13 +135,7 @@ imm
 addr
 tipo
 """
-
-def buscarInstruccion(Matriz, Instruccion):
-    EstructuraInstruccion = ""
-    for i in range(len(Matriz)):
-        if Instruccion == Matriz[i][0]:
-            EstructuraInstruccion = Matriz[i]
-    return EstructuraInstruccion
+"""
 
 for i in range(len(MatrizCodigo)):
     Instruccion = MatrizCodigo[i][0]
@@ -121,43 +154,43 @@ for i in range(len(MatrizCodigo)):
 
         #Tipo R1
         if Tipo == "R1":
-            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
-            rs = buscarRegistro(MatrizRegistros,Instruccion[2]) 
-            rt = buscarRegistro(MatrizRegistros,Instruccion[3])
+            rd = buscarRegistro(Instruccion[1]) 
+            rs = buscarRegistro(Instruccion[2]) 
+            rt = buscarRegistro(Instruccion[3])
             Shamt = 0
 
         #Tipo R2
         elif Tipo == "R2":
-            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
-            rt = buscarRegistro(MatrizRegistros,Instruccion[2]) 
-            rs = buscarRegistro(MatrizRegistros,Instruccion[3])
+            rd = buscarRegistro(Instruccion[1]) 
+            rt = buscarRegistro(Instruccion[2]) 
+            rs = buscarRegistro(Instruccion[3])
             Shamt = 0
 
         #Tipo R3
         elif Tipo == "R3":
-            rd = buscarRegistro(MatrizRegistros,Instruccion[1]) 
-            rt = buscarRegistro(MatrizRegistros,Instruccion[2]) 
-            Shamt = buscarRegistro(MatrizRegistros,Instruccion[3])
+            rd = buscarRegistro(Instruccion[1]) 
+            rt = buscarRegistro(Instruccion[2]) 
+            Shamt = buscarRegistro(Instruccion[3])
             rs = 0
 
         #Tipo R4
         elif Tipo == "R4":
-            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rs = buscarRegistro(Instruccion[1])
             rt = 0
             rd = 0
             shamt = 0
 
         #Tipo R5
         elif Tipo == "R5":
-            rd = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rd = buscarRegistro(Instruccion[1])
             rt = 0
             rs = 0
             shamt = 0
 
         #Tipo R6
         elif Tipo == "R6":
-            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
-            rt = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rs = buscarRegistro(Instruccion[1])
+            rt = buscarRegistro(Instruccion[2])
             rd = 0
             shamt = 0
 
@@ -172,38 +205,38 @@ for i in range(len(MatrizCodigo)):
 
         #Tipo I1
         elif Tipo == "I1":
-            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
-            rs = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rt = buscarRegistro(Instruccion[1])
+            rs = buscarRegistro(Instruccion[2])
             imm = Instruccion[3]
 
         #Tipo I2
         elif Tipo == "I2":
-            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = buscarRegistro(Instruccion[1])
             imm = Instruccion[2]
-            rs = buscarRegistro(MatrizRegistros,Instruccion[3])
+            rs = buscarRegistro(Instruccion[3])
 
         #Tipo I3
         elif Tipo == "I3":
-            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rs = buscarRegistro(Instruccion[1])
             #label
             rt = Estructura[3]
 
         #Tipo I4
         elif Tipo == "I4":
-            rs = buscarRegistro(MatrizRegistros,Instruccion[1])
-            rt = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rs = buscarRegistro(Instruccion[1])
+            rt = buscarRegistro(Instruccion[2])
             #label
 
         #Tipo I5
         elif Tipo == "I5":
-            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
+            rt = buscarRegistro(Instruccion[1])
             imm = Instruccion[2]
             rs = 0
 
         #Tipo I6
         elif Tipo == "I6":
-            rt = buscarRegistro(MatrizRegistros,Instruccion[1])
-            rd = buscarRegistro(MatrizRegistros,Instruccion[2])
+            rt = buscarRegistro(Instruccion[1])
+            rd = buscarRegistro(Instruccion[2])
             rs = Estructura[3]
 
         #Tipo I7
@@ -212,14 +245,22 @@ for i in range(len(MatrizCodigo)):
             rt = Estructura[3]
             rs = 0
 
-
+"""
 #print(buscarRegistro(MatrizRegistros, "$s5"))
 
 #imprimir(MatrizInstrucciones)
 
+"""
+def hexaAentero(Cadena):
+    Cadena = Cadena.replace("0x","")
+    return hex(Cadena)
 
-
-
-
+a = 0x400004
+b = str(hex(a))
+print(a)
+print(b)
+print(hexaAentero(b))
+print(hex(hexaAentero(b)))
+"""
 
 ventana.mainloop() #Corre la ventana
