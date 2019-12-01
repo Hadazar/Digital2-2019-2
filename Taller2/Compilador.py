@@ -118,12 +118,14 @@ def compilar():
     for i in range(len(MatrizCodigo)):
 
         Instruccion = MatrizCodigo[i]
-        InstruccionHexa = compilarInstruccion(Instruccion)
-        MatrizHexa = MatrizHexa + hex(int(InstruccionHexa)) + "\n"
+        DireccionInstruccion = DireccionBase + i*4
+        InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
+        Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
+        Cadena = "0x" + Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
+        MatrizHexa = MatrizHexa + Cadena + "\n"
 
 
-
-def compilarInstruccion(Instruccion):
+def compilarInstruccion(Instruccion,DireccionInstruccion):
 
     Opcode, rs, rt, rd, Shamt, Func, imm, addr = 0,0,0,0,0,0,0,0
     InstruccionHexa = None
@@ -189,7 +191,7 @@ def compilarInstruccion(Instruccion):
 
         print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
-        print(hex(int(InstruccionHexa)))
+        print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     #Instruccion tipo I o J
     elif TipoR == False:
@@ -216,14 +218,14 @@ def compilarInstruccion(Instruccion):
         #Tipo I3
         elif Tipo == "I3":
             rs = buscarRegistro(Instruccion[1])
-            imm = Labels[Instruccion[2]]
+            imm = Labels[Instruccion[2]] - (DireccionInstruccion-17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
             rt = int(Estructura[3])
 
         #Tipo I4
         elif Tipo == "I4":
             rs = buscarRegistro(Instruccion[1])
             rt = buscarRegistro(Instruccion[2])
-            imm = Labels[Instruccion[3]]
+            imm = Labels[Instruccion[3]] - (DireccionInstruccion + 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
 
         #Tipo I5
         elif Tipo == "I5":
@@ -239,18 +241,22 @@ def compilarInstruccion(Instruccion):
 
         #Tipo I7
         elif Tipo == "I7":
-            imm = Labels[Instruccion[1]]
+            imm = Labels[Instruccion[1]] - (DireccionInstruccion + 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
             rt = int(Estructura[3])
             rs = 0
+
+        #Completo a 2 para números negativos
+        if imm < 0:
+            imm = 65536 + imm #65536dec=10000hex=FFFF+1hex
 
         if TipoJ == False:
             print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", imm: ",imm,"\n")
             InstruccionHexa= imm + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
-            print(hex(int(InstruccionHexa)))
+            print("Hexa: ",hex(int(InstruccionHexa)),"\n")
         else:
             print("op: ",Opcode,", addr: ",rs,"\n")
             InstruccionHexa= imm + Opcode*pow(2,26)
-            print(hex(int(InstruccionHexa)))
+            print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     return InstruccionHexa
 
