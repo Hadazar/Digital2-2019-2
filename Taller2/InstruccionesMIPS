@@ -1,4 +1,29 @@
-addi 8 I1
-andi 12 I1
-sb 40 I2
+bltz 1 I3 0
 bgez 1 I3 1
+j 2 J
+jal 3 J
+beq 4 I4 
+bne 5 I4
+blez 6 I8
+bgtz 7 I8
+addi 8 I1
+addiu 9 I1
+slti 10 I1
+sltiu 11 I1
+andi 12 I1
+ori 13 I1
+xori 14 I1
+lui 15 I5
+mfc0 16 I6 0
+mtc0 16 I6 4
+bc1f 17 I7 0
+bc1t 17 I7 1
+mul 28 R+ 2
+lb 32 I2
+lh 33 I2
+lw 35 I2
+lbu 36 I2
+lhu 37 I2
+sb 40 I2
+sh 41 I2
+sw 43 I2
