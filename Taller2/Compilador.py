@@ -25,6 +25,8 @@ Registros = BancoRegistros.read()
 CodigoEjemplo = open("Ejemplo","r")
 Ejemplo = CodigoEjemplo.read()
 
+CodigoHexa = open("memfile.dat","w")
+
 def convertirAmatriz(Texto):
     Lista = Texto.split("\n")
     n = len(Lista)
@@ -51,7 +53,7 @@ def capturarLabels():
             Labels[label] = DireccionBase+i*4
             MatrizCodigo.pop(i)
 
-def getOpcode():
+def exportar():
     #print("Opcode: \n")
     #print(SetInstrucciones)
     capturarLabels()
@@ -65,6 +67,11 @@ def capturarCodigo():
     Codigo = CodigoMips.get(1.0,END)
     MatrizCodigo = convertirAmatriz(Codigo)
     print("Codigo: \n", Codigo)
+    capturarLabels()
+    imprimir(MatrizCodigo)
+    print("\n\n")
+    compilar()
+    print(MatrizHexa)
 
 def borrar():
     CodigoMips.delete(1.0,END)
@@ -97,18 +104,19 @@ MatrizHexa = ""
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:getOpcode()).place(x=17+115+17,y=17)
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=17+115+17,y=17)
 BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
 
 #Código MIPS ---------------------------
+CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=17,y=100)
 CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
-CodigoMips.place(x=17,y=100)
-CodigoMips.insert(END,"Escriba aquí su código Mips...")
+CodigoMips.place(x=17,y=140)
+#CodigoMips.insert(END,"Escriba aquí su código Mips...")
 
 #Estado del programa --------------------
 Estatus = 'Compilando...'
-EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=400)
-Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=450)
+EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=440)
+Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=490)
 
 def compilar():
 
