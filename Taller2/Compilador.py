@@ -52,6 +52,9 @@ def exportar():
     CodigoHexa.write("")
     CodigoHexa.write(MatrizHexa) 
     CodigoHexa.close()
+    TextoExportado = "Exportado como: \"" + NombreArchivo +"\""
+    Estatus.set(Estatus.get().replace("Compilado y listo para exportar",TextoExportado))
+
 
 #Busca una instrucción en la lista de instrucciones MIPS
 def buscarInstruccion(Matriz, Instruccion):
@@ -183,12 +186,17 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         elif Tipo == "I1":
             rt = buscarRegistro(Instruccion[1])
             rs = buscarRegistro(Instruccion[2])
-            imm = int(Instruccion[3])
+            #Si el imm esta escrito en hexadecimal
+            if Instruccion[3][0:2] == "0x" or  Instruccion[3][0:2] == "0X":
+                imm = stringAHexa(Instruccion[3])
+            else: imm = int(Instruccion[3])  #Si el imm esta escrito en decimal
 
         #Tipo I2
         elif Tipo == "I2":
             rt = buscarRegistro(Instruccion[1])
-            imm = int(Instruccion[2])
+            if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
+                imm = stringAHexa(Instruccion[2])
+            else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
             rs = buscarRegistro(Instruccion[3])
 
         #Tipo I3
@@ -206,7 +214,9 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         #Tipo I5
         elif Tipo == "I5":
             rt = buscarRegistro(Instruccion[1])
-            imm = int(Instruccion[2])
+            if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
+                imm = stringAHexa(Instruccion[2])
+            else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
             rs = 0
 
         #Tipo I6
@@ -281,6 +291,7 @@ def compilar():
 #Covierte un hexadecimal (escrito como string) en un entero
 def stringAHexa(Palabra):
     Palabra = Palabra.replace("0x","")
+    Palabra = Palabra.replace("0X","")
     Palabra = Palabra.replace("\n","")
     Valor = 0
     for i in range(len(Palabra)):
