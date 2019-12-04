@@ -2,18 +2,7 @@
 from tkinter import *
 from math import *
 
-ventana = Tk() #Crea la ventana
-
-#Configuración de ventana -------------
-ventana.title("Compilador MIPS")
-ventana.geometry("800x600")
-ventana.resizable(0,0) #Bloquear el tamaño de la ventana
-ventana.configure(background="#B1C340") #Color de fondo
-
-#Configuración de botones -------------
-ColorBoton=("#3FC3D8")
-AnchoBoton=11
-AltoBoton=3
+#-----------------------BACK-END:PARTE FUNCIONAL DEL PROGRAMA---------------------------------
 
 #Tablas de instrucciones y registros MIPS
 Tabla = open("InstruccionesMIPS","r")#Instrucciones tipo I y J
@@ -30,7 +19,7 @@ Labels = {} #Diccionario para almacenar los label y sus direcciones de memoria
 
 DireccionBase = 0x00401000
 
-#Convierte un string en una matriz
+#Convierte un string (un texto) en una matriz
 def convertirAmatriz(Texto):
     Lista = Texto.split("\n")#Convierte el texto en un vector, cada vector es una línea de código
     n = len(Lista)
@@ -42,46 +31,35 @@ def convertirAmatriz(Texto):
         Matriz[i] = Lista[i].split(" ") #Convierte cada línea de código en un vector, cada string es una posición
     return Matriz
 
-#Detecta los labels en el código, los almacena en un diccionario junto con sus respectivas posiciones de memoria, y los elimina de la matriz que contiene al código
-def capturarLabels():
-    global MatrizCodigo, Labels #Se especifican globales, porque se pretende editar
-    n = len(MatrizCodigo) #Cantidad de líneas de código introducidas por el usuario
-    i = 0
-    while i<n:
-        if MatrizCodigo[i][0][-1] == ":":
-            label = MatrizCodigo[i][0].replace(":","")
-            Labels[label] = DireccionBase+i*4
-            print(hex(DireccionBase+i*4))
-            MatrizCodigo.pop(i)
-            n = n-1
-        i = i+1
+#Matrices
+MatrizInstrucciones = convertirAmatriz(SetInstrucciones) #Tipo I y J
+MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
+MatrizHexa = "" #Matriz que almacenará el código hexadecimal
 
-
-def exportar():
-    global CodigoHexa
-    CodigoHexa.write(MatrizHexa)
-    CodigoHexa.close()
-    
-    
-def capturarCodigo():
-    global MatrizCodigo
-    Codigo = CodigoMips.get(1.0,END)
-    MatrizCodigo = convertirAmatriz(Codigo)
-    print("Codigo: \n", Codigo)
-    capturarLabels()
-    imprimir(MatrizCodigo)
-    print("\n\n")
-    compilar()
-    print(MatrizHexa)
-
+#Borra el texto escrito por el usuario
 def borrar():
     CodigoMips.delete(1.0,END)
 
-
+#Función para imprimir una vector por vector (no hace parte funcional del programa, solo se usó para ir depurando el código)
 def imprimir(Matriz):
     for i in Matriz:
         print(i)
 
+#Escribe código en hexadecimal sobre el archivo memfile.dat
+def exportar():
+    global CodigoHexa
+    CodigoHexa.write(MatrizHexa) 
+    CodigoHexa.close()
+
+#Busca una instrucción en la lista de instrucciones MIPS
+def buscarInstruccion(Matriz, Instruccion):
+    EstructuraInstruccion = None
+    for i in range(len(Matriz)):
+        if Instruccion == Matriz[i][0]:
+            EstructuraInstruccion = Matriz[i]
+    return EstructuraInstruccion #retorna un vector con la información de la instrución: Tipo de instrucción, opcode, func (para las tipo r) y al valor de algun registro (para algunas instrucciones especiales)
+
+#Encuentra el número que corresponde al registro
 def buscarRegistro(Registro):
     NumeroRegistro = None
     for i in range(len(BancoRegistros)):
@@ -90,50 +68,20 @@ def buscarRegistro(Registro):
             break
     return NumeroRegistro
 
+#Detecta los labels en el código, los almacena en un diccionario junto con sus respectivas posiciones de memoria, y los elimina de la matriz que contiene al código
+def capturarLabels():
+    global MatrizCodigo, Labels #Se especifican globales, porque se pretende editar variables que estan fuera de la función
+    n = len(MatrizCodigo) #Cantidad de líneas de código introducidas por el usuario
+    i = 0
+    while i<n:
+        if MatrizCodigo[i][0][-1] == ":": #Identifica el label (Fila i, columna 0, última letra del string = dos puntos(:))
+            label = MatrizCodigo[i][0].replace(":","") #Le quita los dos puntos al label
+            Labels[label] = DireccionBase+i*4 #Agrega el label a un diccionario y lo asocia con su posición de memoria
+            MatrizCodigo.pop(i) #Elimina el label
+            n = n-1
+        i = i+1
 
-def buscarInstruccion(Matriz, Instruccion):
-    EstructuraInstruccion = None
-    for i in range(len(Matriz)):
-        if Instruccion == Matriz[i][0]:
-            EstructuraInstruccion = Matriz[i]
-    return EstructuraInstruccion
-
-#Matrices
-MatrizInstrucciones = convertirAmatriz(SetInstrucciones)
-MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
-MatrizHexa = "" #Matriz que almacenará el código hexadecimal
-
-#Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=17+115+17,y=17)
-BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
-
-#Código MIPS ---------------------------
-CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=17,y=100)
-CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
-CodigoMips.place(x=17,y=140)
-#CodigoMips.insert(END,"Escriba aquí su código Mips...")
-
-#Estado del programa --------------------
-Estatus = 'Compilando...'
-EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=440)
-Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=490)
-
-def compilar():
-
-    global MatrizHexa
-    n = len(MatrizCodigo)
-
-    for i in range(len(MatrizCodigo)):
-
-        Instruccion = MatrizCodigo[i]
-        DireccionInstruccion = DireccionBase + i*4
-        InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
-        Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
-        Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
-        MatrizHexa = MatrizHexa + Cadena + "\n"
-
-
+#Función central del programa: convierte una instrucción en su equivalente hexadecimal
 def compilarInstruccion(Instruccion,DireccionInstruccion):
 
     Opcode, rs, rt, rd, Shamt, Func, imm, addr = 0,0,0,0,0,0,0,0
@@ -270,11 +218,59 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
     return InstruccionHexa
 
+#Convierte todo el código a su equivalente hexadecimal
+def compilar():
 
-#print(buscarRegistro("$ra"))
+    global MatrizHexa
+    n = len(MatrizCodigo)
 
-#imprimir(MatrizInstrucciones)
+    for i in range(len(MatrizCodigo)):
+
+        Instruccion = MatrizCodigo[i]
+        DireccionInstruccion = DireccionBase + i*4
+        InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
+        Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
+        Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
+        MatrizHexa = MatrizHexa + Cadena + "\n"
+
+#Captura el texto escrito por el usuario en la interfaz, lo convierte en una matriz, extrae y los labels y compila
+def capturarCodigo():
+    global MatrizCodigo
+    Codigo = CodigoMips.get(1.0,END)
+    MatrizCodigo = convertirAmatriz(Codigo)
+    capturarLabels()
+    compilar()
 
 
+#-----------------------FRONT-END:INTERFAZ GRÁFICA---------------------------------
+
+ventana = Tk() #Crea la ventana
+
+#Configuración de ventana -------------
+ventana.title("Compilador MIPS")
+ventana.geometry("800x600")
+ventana.resizable(0,0) #Bloquear el tamaño de la ventana
+ventana.configure(background="#B1C340") #Color de fondo
+
+#Configuración de botones -------------
+ColorBoton=("#3FC3D8")
+AnchoBoton=11
+AltoBoton=3
+
+#Botones -----------------------------
+Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=17+115+17,y=17)
+BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
+
+#Código MIPS ---------------------------
+CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=17,y=100)
+CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
+CodigoMips.place(x=17,y=140)
+#CodigoMips.insert(END,"Escriba aquí su código Mips...")
+
+#Estado del programa --------------------
+Estatus = 'Compilando...'
+EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=440)
+Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=490)
 
 ventana.mainloop() #Corre la ventana
