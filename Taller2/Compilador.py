@@ -255,14 +255,26 @@ def compilar():
     MatrizHexa = "" #Vacia la matriz
     n = len(MatrizCodigo)
 
+    Estatus.set(Estatus.get() + "\n" + "Dirección:          " + "Instruccion:\n")
+
     for i in range(len(MatrizCodigo)):
 
         Instruccion = MatrizCodigo[i]
         DireccionInstruccion = DireccionBase + i*4
         InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
-        Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
+
+        Cadena = str(hex(int(InstruccionHexa))) #Convierte la instrucción en string hexadecimal
+        Cadena = Cadena.replace("0x","") #Lo transforma en string y le quita el "0x"
         Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda si hacen falta para completar 8 caracteres
-        MatrizHexa = MatrizHexa + Cadena + "\n" #Añade línea por línea a la matriz hexadecimal
+
+        Direccion = str(hex(int(DireccionInstruccion)))
+        Direccion = Direccion.replace("0x","")
+        Direccion = Direccion.zfill(8)
+
+        Estatus.set(Estatus.get() + "\n0x" + Direccion.upper() + "      0x"+ Cadena.upper()) #Actualiza elcuadro de estado del programa
+        MatrizHexa = MatrizHexa + Cadena.upper() + "\n" #Añade línea por línea a la matriz hexadecimal
+    
+    Estatus.set(Estatus.get().replace("Compilando...","Compilado y listo para exportar"))
 
 #Captura el texto escrito por el usuario en la interfaz, lo convierte en una matriz, extrae y los labels y compila
 
@@ -291,6 +303,9 @@ def stringAHexa(Palabra):
 
 def capturarCodigo():
     global MatrizCodigo, DireccionBase
+
+    Estatus.set("Estado: Compilando...\n")
+
     DireccionBase = stringAHexa(CuadroDireccion.get(1.0,END))
     Codigo = CodigoMips.get(1.0,END)
     MatrizCodigo = convertirAmatriz(Codigo)
@@ -342,8 +357,8 @@ CodigoMips.place(x=25,y=260)
 
 #Estado del programa --------------------
 Estatus = StringVar() #Para poder editar dinamicamente
-Estatus.set("Compilando...")
-Estado = Label(ventana, textvariable = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=260)
+Estatus.set("Estado: Esperando a que el usuario pulse iniciar para realizar compilación...")
+Estado = Label(ventana, textvariable = Estatus, width=38, height=21, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
 
 #label.config(textvariable=texto)
 #palabra = "0xabFC450d"
