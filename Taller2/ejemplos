@@ -24,3 +24,19 @@ add $a0, $a1, $0
 loop:
 
 jal 4194348
+
+main:
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+addi $t0, $0, 15
+sw $t0, 0x8000($gp)
+addi $a1, $0, 27
+sw $a1, 0X8004($gp)
+lw $a0, 0x8000($gp)
+jal greater
+lw $ra, 0($sp)
+addi $sp, $sp, 4
+jr $ra
+greater:
+slt $v0, $a1, $a0
+jr $ra

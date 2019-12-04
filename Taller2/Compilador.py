@@ -130,7 +130,9 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         elif Tipo == "R3":
             rd = buscarRegistro(Instruccion[1]) 
             rt = buscarRegistro(Instruccion[2]) 
-            Shamt = buscarRegistro(Instruccion[3])
+            if Instruccion[3][0:2] == "0x" or  Instruccion[3][0:2] == "0X": #Si el imm esta escrito en hexadecimal
+                Shamt = stringAHexa(Instruccion[3])
+            else: Shamt = int(Instruccion[3])  #Si el imm esta escrito en decimal
             rs = 0
 
         #Tipo R4
@@ -138,22 +140,23 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             rs = buscarRegistro(Instruccion[1])
             rt = 0
             rd = 0
-            shamt = 0
+            Shamt = 0
 
         #Tipo R5
         elif Tipo == "R5":
             rd = buscarRegistro(Instruccion[1])
             rt = 0
             rs = 0
-            shamt = 0
+            Shamt = 0
 
         #Tipo R6
         elif Tipo == "R6":
             rs = buscarRegistro(Instruccion[1])
             rt = buscarRegistro(Instruccion[2])
             rd = 0
-            shamt = 0
+            Shamt = 0
 
+        print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt, "Tipo",Tipo, "\n")
         #Multiplica cada parte de la instrucción por su respectiva potencia de dos y suma, así construye la instrucción completa
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
                     # op rs rt rd shamt func
@@ -368,7 +371,7 @@ CodigoMips.place(x=25,y=260)
 
 #Estado del programa --------------------
 Estatus = StringVar() #Para poder editar dinamicamente
-Estatus.set("Estado: Esperando a que el usuario pulse iniciar para realizar compilación...")
+Estatus.set("\nEstado: Esperando a que el usuario pulse iniciar para realizar compilación...")
 Estado = Label(ventana, textvariable = Estatus, width=38, height=21, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
 
 #label.config(textvariable=texto)
