@@ -84,25 +84,28 @@ def capturarLabels():
 #Función central del programa: convierte una instrucción en su equivalente hexadecimal
 def compilarInstruccion(Instruccion,DireccionInstruccion):
 
+    #Inicializa todas las variables necesarias para codificar las instrucciones
     Opcode, rs, rt, rd, Shamt, Func, imm, addr = 0,0,0,0,0,0,0,0
-    InstruccionHexa = None
-    Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion[0])#Busca en la lista tipo I y J
-    TipoR = False
+    InstruccionHexa = None #Variable para almacenar el hexadecimal de una instrucción
+    Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion[0])#Busca la información de la instrucción (opcode, tipo,...) en la lista tipo I y J
+    TipoR = False #Bandera para indicar que no es tipo R
 
-    #Si no las encuentra en la lista de tipo I y J entonces las busva en la lista tipoR
+    #Si no las encuentra en la lista de tipo I y J entonces las busca en la lista tipoR
     if Estructura == None:
         print("buscando en R")
         Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion[0])
-        TipoR = True
+        TipoR = True #Bandera para indicar que es tipo R
 
-    Tipo = Estructura[2]
+    Tipo = Estructura[2] #Específica el tipo de instrucción
     print("Tipo: ", Tipo)
     
-    #Instruccion tipo R
+    #Si la instruccion tipo R:
     if TipoR == True:
 
-        Opcode = 0
+        Opcode = 0 #El opcode siempre es cero para las tipo R
         Func = int(Estructura[1])
+
+        #Para cada subtipo hay un orden en los registros:
 
         #Tipo R1
         if Tipo == "R1":
@@ -150,11 +153,14 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
         print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
-    #Instruccion tipo I o J
+    #Si la instruccion es tipo I o J:
     elif TipoR == False:
 
         Opcode = int(Estructura[1])
-        TipoJ = False
+        TipoJ = False #Bandera para indicar que no es tipo J
+
+        #Para cada subtipo hay un orden en los registros:
+
         #Tipo J
         if Tipo == "J":
             addr = Labels[Instruccion[1]]/4
@@ -230,8 +236,8 @@ def compilar():
         DireccionInstruccion = DireccionBase + i*4
         InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
         Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
-        Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
-        MatrizHexa = MatrizHexa + Cadena + "\n"
+        Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda si hacen falta para completar 8 caracteres
+        MatrizHexa = MatrizHexa + Cadena + "\n" #Añade línea por línea a la matriz hexadecimal
 
 #Captura el texto escrito por el usuario en la interfaz, lo convierte en una matriz, extrae y los labels y compila
 def capturarCodigo():
