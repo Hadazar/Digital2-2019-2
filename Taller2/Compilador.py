@@ -1,6 +1,7 @@
 
 from tkinter import *
 from math import *
+from random import randrange
 #from PIL import Image, ImageTk as itk
 
 #-----------------------BACK-END:PARTE FUNCIONAL DEL PROGRAMA---------------------------------
@@ -156,7 +157,6 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             rd = 0
             Shamt = 0
 
-        print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt, "Tipo",Tipo, "\n")
         #Multiplica cada parte de la instrucción por su respectiva potencia de dos y suma, así construye la instrucción completa
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
                     # op rs rt rd shamt func
@@ -318,7 +318,7 @@ def stringAHexa(Palabra):
 def capturarCodigo():
     global MatrizCodigo, DireccionBase
 
-    Estatus.set("Estado: Compilando...\n")
+    Estatus.set("\nEstado: Compilando...\n")
 
     DireccionBase = stringAHexa(CuadroDireccion.get(1.0,END))
     Codigo = CodigoMips.get(1.0,END)
@@ -348,10 +348,18 @@ AnchoBoton=6
 AltoBoton=3
 
 #Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=310) #Ejecuta capturarCodigo
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=410)
-BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=170)
-Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=170)
+
+Iniciar = Boton0=Button(ventana,bg=ColorBoton,text="Iniciar",width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo())#Ejecuta capturarCodigo
+Iniciar.place(x=362,y=310)
+
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar())
+Exportar.place(x=362,y=410)
+
+BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar())
+BorrarTodo.place(x=650,y=170)
+
+Ejemplo = Boton0=Button(ventana,text="Ejemplo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : extraerEjemplo())
+Ejemplo.place(x=530,y=170)
 
 #Archivo de exportación
 CuadroExportacionEtiqueta = Message(ventana, text = "Inserte el nombre del archivo de exportación:", width = 300, bg="#BEC7C9").place(x=25,y=20)
@@ -372,11 +380,23 @@ CodigoMips.place(x=25,y=260)
 #Estado del programa --------------------
 Estatus = StringVar() #Para poder editar dinamicamente
 Estatus.set("\nEstado: Esperando a que el usuario pulse iniciar para realizar compilación...")
-Estado = Label(ventana, textvariable = Estatus, width=38, height=21, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
+Estado = Label(ventana, textvariable = Estatus, width=35, height=20, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
 
-#label.config(textvariable=texto)
-#palabra = "0xabFC450d"
-#numero = stringAHexa(palabra)
-#print(hex(numero))
+
+def extraerEjemplo():
+    NumeroAleatorio = randrange(3)+1
+    NumeroAleatorio = str(NumeroAleatorio)
+    Ubicacion = "Ejemplos/" + NumeroAleatorio
+    Ejemplo = open(Ubicacion,"r")
+    Ejemplo = Ejemplo.read()
+    Ejemplo = Ejemplo.strip()
+    DireccionEjemplo = Ejemplo[0:10]
+    Ejemplo = Ejemplo.replace(DireccionEjemplo + "\n","")
+    CuadroDireccion.delete(1.0,END)
+    borrar()
+    CuadroDireccion.insert(END,DireccionEjemplo)
+    CodigoMips.insert(END,Ejemplo)
+    
+#extraerEjemplo()
 
 ventana.mainloop() #Corre la ventana
