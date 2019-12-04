@@ -42,16 +42,30 @@ def convertirAmatriz(Texto):
 MatrizCodigo = convertirAmatriz(Ejemplo)
 Labels = {} #Se crea como un diccionario
 BancoRegistros = Registros.split(" ")
-DireccionBase = 0x00400000
+DireccionBase = 0x00401000
 
 def capturarLabels():
     global MatrizCodigo, Labels
     n = len(MatrizCodigo)
+    """
     for i in range(0,n-1):
+
         if MatrizCodigo[i][0][-1] == ":":
             label = MatrizCodigo[i][0].replace(":","")
             Labels[label] = DireccionBase+i*4
             MatrizCodigo.pop(i)
+            n = len(MatrizCodigo)-1
+    """
+    i = 0
+    while i<n:
+        if MatrizCodigo[i][0][-1] == ":":
+            label = MatrizCodigo[i][0].replace(":","")
+            Labels[label] = DireccionBase+i*4
+            print(hex(DireccionBase+i*4))
+            MatrizCodigo.pop(i)
+            n = n-1
+        i = i+1
+
 
 def exportar():
     #print("Opcode: \n")
@@ -61,6 +75,7 @@ def exportar():
     print("\n\n")
     compilar()
     print(MatrizHexa)
+    
     
 def capturarCodigo():
     global MatrizCodigo
@@ -208,7 +223,8 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         TipoJ = False
         #Tipo J
         if Tipo == "J":
-            addr = Instruccion[1]
+            addr = Labels[Instruccion[1]]/4
+            print(addr)
             TipoJ = True
 
         #Tipo I1
@@ -233,7 +249,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         elif Tipo == "I4":
             rs = buscarRegistro(Instruccion[1])
             rt = buscarRegistro(Instruccion[2])
-            imm = Labels[Instruccion[3]] - (DireccionInstruccion + 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
+            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
 
         #Tipo I5
         elif Tipo == "I5":
@@ -249,7 +265,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo I7
         elif Tipo == "I7":
-            imm = Labels[Instruccion[1]] - (DireccionInstruccion + 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
+            imm = Labels[Instruccion[1]] - (DireccionInstruccion - 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
             rt = int(Estructura[3])
             rs = 0
 
@@ -262,8 +278,8 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             InstruccionHexa= imm + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
             print("Hexa: ",hex(int(InstruccionHexa)),"\n")
         else:
-            print("op: ",Opcode,", addr: ",rs,"\n")
-            InstruccionHexa= imm + Opcode*pow(2,26)
+            print("op: ",Opcode,", addr: ",addr,"\n")
+            InstruccionHexa= addr + Opcode*pow(2,26)
             print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     return InstruccionHexa

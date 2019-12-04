@@ -1,0 +1,26 @@
+addi $s0, $0, 73
+sw $t1, -7($t2)
+sub $t1, $s7, $s2
+
+main:
+addi $sp, $sp, -4
+sw $ra, 0($sp)
+addi $t0, $0, 15
+sw $t0, 32768($gp)
+addi $a1, $0, 27
+sw $a1, 32772($gp)
+lw $a0, 32768($gp)
+jal greater
+lw $ra, 0($sp)
+addi $sp, $sp, 4
+jr $ra
+greater:
+slt $v0, $a1, $a0
+jr $ra
+
+beq $t0, $s1, loop
+add $a0, $a1, $0
+add $a0, $a1, $0
+loop:
+
+jal 4194348
