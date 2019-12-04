@@ -92,12 +92,12 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
     #Si no las encuentra en la lista de tipo I y J entonces las busca en la lista tipoR
     if Estructura == None:
-        print("buscando en R")
+        #print("buscando en R")
         Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion[0])
         TipoR = True #Bandera para indicar que es tipo R
 
     Tipo = Estructura[2] #Específica el tipo de instrucción
-    print("Tipo: ", Tipo)
+    #print("Tipo: ", Tipo)
     
     #Si la instruccion tipo R:
     if TipoR == True:
@@ -149,9 +149,19 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             rd = 0
             shamt = 0
 
-        print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
+        #Multiplica cada parte de la instrucción por su respectiva potencia de dos y suma, así construye la instrucción completa
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
-        print("Hexa: ",hex(int(InstruccionHexa)),"\n")
+                    # op rs rt rd shamt func
+                    #  6  5  5  5     5    6
+                    # 26 =5 +5 +5    +5   +6  => op*2^26
+                    #    21= 5 +5    +5   +6  => rs*2^21
+                    #       16= 5    +5   +6  => rt*2^16
+                    #             11= 5   +6  => rd*2^11
+                    #                      6  => shamt*2^6
+                    #                         => func
+
+        #print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
+        #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     #Si la instruccion es tipo I o J:
     elif TipoR == False:
@@ -163,9 +173,9 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo J
         if Tipo == "J":
-            addr = Labels[Instruccion[1]]/4
+            addr = Labels[Instruccion[1]]/4 #La dirección del label quitandole dos ceros a la derecha
             print(addr)
-            TipoJ = True
+            TipoJ = True #Bandera para indicar que no es tipo J
 
         #Tipo I1
         elif Tipo == "I1":
@@ -182,14 +192,14 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         #Tipo I3
         elif Tipo == "I3":
             rs = buscarRegistro(Instruccion[1])
-            imm = Labels[Instruccion[2]] - (DireccionInstruccion-17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
-            rt = int(Estructura[3])
+            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 #Cantidad de líneas de código que debe saltar el pc para llegar al label
+            rt = int(Estructura[3]) #Para este tipo de instrucción el rt viene con un valor por defecto
 
         #Tipo I4
         elif Tipo == "I4":
             rs = buscarRegistro(Instruccion[1])
             rt = buscarRegistro(Instruccion[2])
-            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
+            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 
 
         #Tipo I5
         elif Tipo == "I5":
@@ -205,22 +215,34 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo I7
         elif Tipo == "I7":
-            imm = Labels[Instruccion[1]] - (DireccionInstruccion - 17) #Dirección de la etiqueta menos el PC (dirección de instrucción siguiente)
+            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4
             rt = int(Estructura[3])
             rs = 0
 
-        #Completo a 2 para números negativos
+        #Complemento a 2 para números negativos
         if imm < 0:
-            imm = 65536 + imm #65536dec=10000hex=FFFF+1hex
+            imm = 65536 + imm #(65536)dec=(10000)hex=(FFFF+1)hex
 
         if TipoJ == False:
-            print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", imm: ",imm,"\n")
             InstruccionHexa= imm + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
-            print("Hexa: ",hex(int(InstruccionHexa)),"\n")
+                    # op rs rt imm
+                    #  6  5  5  16
+                    # 26 =5 +5 +16  => op*2^26
+                    #    21= 5 +16  => rs*2^21
+                    #           16  => rt*2^16
+                    #               => imm
+
+            #print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", imm: ",imm,"\n")
+            #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
         else:
-            print("op: ",Opcode,", addr: ",addr,"\n")
             InstruccionHexa= addr + Opcode*pow(2,26)
-            print("Hexa: ",hex(int(InstruccionHexa)),"\n")
+                    # op addr
+                    #  6   26
+                    #      26  => op*2^26
+                    #          => addr
+
+            #print("op: ",Opcode,", addr: ",addr,"\n")
+            #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     return InstruccionHexa
 
@@ -263,16 +285,23 @@ ColorBoton=("#3FC3D8")
 AnchoBoton=11
 AltoBoton=3
 
+#Logo
+"""
+Logo = Image.open("LogoTaller2.png")
+Logo.resize((115,17), Image.ANTIALTAS)
+Logo = ImageTk.PhotoImage(Logo)
+BotonLogo = Button(ventana, image=Logo, text="abc", compound="top")
+BotonLogo.place(x=17+115+17+115+17+115+17,y=17)
+"""
 #Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
+Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17) #Ejecuta capturarCodigo
 Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=17+115+17,y=17)
 BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
 
 #Código MIPS ---------------------------
 CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=17,y=100)
-CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10)
+CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
 CodigoMips.place(x=17,y=140)
-#CodigoMips.insert(END,"Escriba aquí su código Mips...")
 
 #Estado del programa --------------------
 Estatus = 'Compilando...'
