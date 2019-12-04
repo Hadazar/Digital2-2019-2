@@ -45,6 +45,13 @@ def imprimir(Matriz):
     for i in Matriz:
         print(i)
 
+#Complemento a 2 para números negativos
+def complementoAdos(num):
+    Complemento = num
+    if num < 0:
+        Complemento = 65536 + num #(65536)dec=(10000)hex=(FFFF+1)hex
+    return Complemento
+
 #Escribe código en hexadecimal sobre el archivo memfile.dat
 def exportar():
     NombreArchivo = CuadroExportacion.get(1.0,END) + ".dat" #Obtiene el nombre del archivo de la interfaz y le agrega la extensión .dat
@@ -233,10 +240,8 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             imm = (Labels[Instruccion[1]] - (DireccionInstruccion+4))/4
             rt = int(Estructura[3])
             rs = 0
-
-        #Complemento a 2 para números negativos
-        if imm < 0:
-            imm = 65536 + imm #(65536)dec=(10000)hex=(FFFF+1)hex
+        
+        imm = complementoAdos(imm) #Le hace complemtento a dos solo si es negativo, sino lo deja igual
 
         if TipoJ == False:
             InstruccionHexa= imm + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
