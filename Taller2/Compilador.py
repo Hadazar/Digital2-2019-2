@@ -1,6 +1,7 @@
 
 from tkinter import *
 from math import *
+#from PIL import Image, ImageTk as itk
 
 #-----------------------BACK-END:PARTE FUNCIONAL DEL PROGRAMA---------------------------------
 
@@ -276,7 +277,7 @@ ventana = Tk() #Crea la ventana
 
 #Configuración de ventana -------------
 ventana.title("Compilador MIPS")
-ventana.geometry("800x600")
+ventana.geometry("800x650")
 ventana.resizable(0,0) #Bloquear el tamaño de la ventana
 ventana.configure(background="#B1C340") #Color de fondo
 
@@ -294,26 +295,42 @@ BotonLogo = Button(ventana, image=Logo, text="abc", compound="top")
 BotonLogo.place(x=17+115+17+115+17+115+17,y=17)
 """
 #Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=250) #Ejecuta capturarCodigo
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=350)
-BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=110)
-Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=110)
+Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=300) #Ejecuta capturarCodigo
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=400)
+BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=160)
+Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=160)
 
 #Código MIPS ---------------------------
-CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=150)
+CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=200)
 CodigoMips = Text(ventana,width=35,height=20, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
-CodigoMips.place(x=25,y=200)
+CodigoMips.place(x=25,y=250)
 
-CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=30)
+CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=80)
 CuadroDireccion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
-CuadroDireccion.place(x=25,y=80)
+CuadroDireccion.place(x=25,y=130)
 
 Estatus = 'Compilando...'
-Estado = Label(ventana, text = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=200)
+Estado = Label(ventana, text = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=250)
 
+#LogoImg = PhotoImage(file="LogoTaller2.png")
+#self.canvas1.create_image(30, 100, image=LogoImg, anchor="nw")
+#LogoImg.zoom()
+
+#LogoImg = Image.open("LogoTaller2.png")
+#LogoImg.resize((115,17), Image.ANTIALTAS)
+#LogoImg = itk.PhotoImage(LogoImg)
+#Logo = Label(ventana, width=300,height=80, image=LogoImg).place(x=469,y=20)
+"""
 LogoImg = PhotoImage(file="LogoTaller2.png")
-#LogoImg = LogoImg.zoom(50)
-Logo = Label(ventana, width=100,height=50, image=LogoImg).place(x=530,y=50)
+#LogoImg._
+canvas1 = Canvas(ventana)
+canvas1.pack(fill=BOTH)
+canvas1.create_image(0, 0, image=LogoImg, anchor=NW)
+canvas1.place(x=469,y=20)
+canvas1.size
+"""
+LogoImg = PhotoImage(file="LogoTaller2_2.png")
+Logo = Label(ventana, width=280,height=110, image=LogoImg).place(x=480,y=25)
 #Estado del programa --------------------
 
 """
