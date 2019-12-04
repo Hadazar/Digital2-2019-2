@@ -282,7 +282,7 @@ ventana.configure(background="#B1C340") #Color de fondo
 
 #Configuración de botones -------------
 ColorBoton=("#3FC3D8")
-AnchoBoton=11
+AnchoBoton=6
 AltoBoton=3
 
 #Logo
@@ -294,18 +294,31 @@ BotonLogo = Button(ventana, image=Logo, text="abc", compound="top")
 BotonLogo.place(x=17+115+17+115+17+115+17,y=17)
 """
 #Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17) #Ejecuta capturarCodigo
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=17+115+17,y=17)
-BorrarTodo = Boton0=Button(ventana,text="Borrar todo",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=17+115+17+115+17,y=17)
+Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=250) #Ejecuta capturarCodigo
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=350)
+BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=110)
+Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=110)
 
 #Código MIPS ---------------------------
-CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=17,y=100)
-CodigoMips = Text(ventana,width=92,height=15, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
-CodigoMips.place(x=17,y=140)
+CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=150)
+CodigoMips = Text(ventana,width=35,height=20, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
+CodigoMips.place(x=25,y=200)
 
+CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=30)
+CuadroDireccion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
+CuadroDireccion.place(x=25,y=80)
+
+Estatus = 'Compilando...'
+Estado = Label(ventana, text = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=200)
+
+LogoImg = PhotoImage(file="LogoTaller2.png")
+#LogoImg = LogoImg.zoom(50)
+Logo = Label(ventana, width=100,height=50, image=LogoImg).place(x=530,y=50)
 #Estado del programa --------------------
+
+"""
 Estatus = 'Compilando...'
 EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=440)
 Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=490)
-
+"""
 ventana.mainloop() #Corre la ventana
