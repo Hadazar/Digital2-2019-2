@@ -14,11 +14,9 @@ BancoRegistros = open("BancoDeRegistros","r")#Banco de registros
 Registros = BancoRegistros.read()
 BancoRegistros = Registros.split(" ")#Vector que contiene los registros
 
-CodigoHexa = open("memfile.dat","w")#Archivo sobre el cual se exporta el hexadecimal
 MatrizCodigo = []#Matriz que almacena el código escrito por el usuario
 Labels = {} #Diccionario para almacenar los label y sus direcciones de memoria
-
-DireccionBase = 0x00401000
+DireccionBase = None
 
 #Convierte un string (un texto) en una matriz
 def convertirAmatriz(Texto):
@@ -48,7 +46,10 @@ def imprimir(Matriz):
 
 #Escribe código en hexadecimal sobre el archivo memfile.dat
 def exportar():
-    global CodigoHexa
+    NombreArchivo = CuadroExportacion.get(1.0,END) + ".dat" #Obtiene el nombre del archivo de la interfaz y le agrega la extensión .dat
+    NombreArchivo = NombreArchivo.replace("\n","") #Quita el salto de línea al final del nombre
+    CodigoHexa = open(NombreArchivo,"w")#Archivo sobre el cual se exporta el hexadecimal
+    CodigoHexa.write("")
     CodigoHexa.write(MatrizHexa) 
     CodigoHexa.close()
 
@@ -193,7 +194,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         #Tipo I3
         elif Tipo == "I3":
             rs = buscarRegistro(Instruccion[1])
-            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 #Cantidad de líneas de código que debe saltar el pc para llegar al label
+            imm = (Labels[Instruccion[2]] - (DireccionInstruccion+4))/4 #Cantidad de líneas de código que debe saltar el pc para llegar al label
             rt = int(Estructura[3]) #Para este tipo de instrucción el rt viene con un valor por defecto
 
         #Tipo I4
@@ -216,7 +217,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo I7
         elif Tipo == "I7":
-            imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4
+            imm = (Labels[Instruccion[1]] - (DireccionInstruccion+4))/4
             rt = int(Estructura[3])
             rs = 0
 
@@ -251,6 +252,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 def compilar():
 
     global MatrizHexa
+    MatrizHexa = "" #Vacia la matriz
     n = len(MatrizCodigo)
 
     for i in range(len(MatrizCodigo)):
@@ -263,8 +265,33 @@ def compilar():
         MatrizHexa = MatrizHexa + Cadena + "\n" #Añade línea por línea a la matriz hexadecimal
 
 #Captura el texto escrito por el usuario en la interfaz, lo convierte en una matriz, extrae y los labels y compila
+
+#Covierte un hexadecimal (escrito como string) en un entero
+def stringAHexa(Palabra):
+    Palabra = Palabra.replace("0x","")
+    Palabra = Palabra.replace("\n","")
+    Valor = 0
+    for i in range(len(Palabra)):
+        Cifra = 0
+        if Palabra[-1-i] == "A" or Palabra[-1-i] == "a":
+            Cifra = 10
+        elif Palabra[-1-i] == "B" or Palabra[-1-i] == "b":
+            Cifra = 11
+        elif Palabra[-1-i] == "C" or Palabra[-1-i] == "c":
+            Cifra = 12
+        elif Palabra[-1-i] == "D" or Palabra[-1-i] == "d":
+            Cifra = 13
+        elif Palabra[-1-i] == "E" or Palabra[-1-i] == "e":
+            Cifra = 14
+        elif Palabra[-1-i] == "F" or Palabra[-1-i] == "f":
+            Cifra = 15
+        else: Cifra = int(Palabra[-1-i])
+        Valor = Valor + int(Cifra*pow(16,i))
+    return Valor
+
 def capturarCodigo():
-    global MatrizCodigo
+    global MatrizCodigo, DireccionBase
+    DireccionBase = stringAHexa(CuadroDireccion.get(1.0,END))
     Codigo = CodigoMips.get(1.0,END)
     MatrizCodigo = convertirAmatriz(Codigo)
     capturarLabels()
@@ -279,63 +306,48 @@ ventana = Tk() #Crea la ventana
 ventana.title("Compilador MIPS")
 ventana.geometry("800x650")
 ventana.resizable(0,0) #Bloquear el tamaño de la ventana
-ventana.configure(background="#B1C340") #Color de fondo
+ventana.configure(background="#43B1C5") #Color de fondo
+
+#Logo ----------------------------
+LogoImg = PhotoImage(file="LogoTaller2_2.png")
+Logo = Label(ventana, width=280,height=110, image=LogoImg).place(x=480,y=25)
+
 
 #Configuración de botones -------------
-ColorBoton=("#3FC3D8")
+ColorBoton=("#F3F039")
 AnchoBoton=6
 AltoBoton=3
 
-#Logo
-"""
-Logo = Image.open("LogoTaller2.png")
-Logo.resize((115,17), Image.ANTIALTAS)
-Logo = ImageTk.PhotoImage(Logo)
-BotonLogo = Button(ventana, image=Logo, text="abc", compound="top")
-BotonLogo.place(x=17+115+17+115+17+115+17,y=17)
-"""
 #Botones -----------------------------
-Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=300) #Ejecuta capturarCodigo
-Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=400)
-BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=160)
-Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=160)
+Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=362,y=310) #Ejecuta capturarCodigo
+Exportar = Boton0=Button(ventana,text="Exportar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:exportar()).place(x=362,y=410)
+BorrarTodo = Boton0=Button(ventana,text="Borrar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=650,y=170)
+Copiar = Boton0=Button(ventana,text="Copiar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda : borrar()).place(x=530,y=170)
+
+#Archivo de exportación
+CuadroExportacionEtiqueta = Message(ventana, text = "Inserte el nombre del archivo de exportación:", width = 300, bg="#BEC7C9").place(x=25,y=20)
+CuadroExportacion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
+CuadroExportacion.place(x=25,y=60)
+CuadroExportacion.insert(END,"memfile")
+#Dirección base
+CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=120)
+CuadroDireccion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
+CuadroDireccion.place(x=25,y=160)
+CuadroDireccion.insert(END,"0x00400000")
 
 #Código MIPS ---------------------------
-CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=200)
+CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=220)
 CodigoMips = Text(ventana,width=35,height=20, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
-CodigoMips.place(x=25,y=250)
+CodigoMips.place(x=25,y=260)
 
-CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=80)
-CuadroDireccion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
-CuadroDireccion.place(x=25,y=130)
-
-Estatus = 'Compilando...'
-Estado = Label(ventana, text = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=250)
-
-#LogoImg = PhotoImage(file="LogoTaller2.png")
-#self.canvas1.create_image(30, 100, image=LogoImg, anchor="nw")
-#LogoImg.zoom()
-
-#LogoImg = Image.open("LogoTaller2.png")
-#LogoImg.resize((115,17), Image.ANTIALTAS)
-#LogoImg = itk.PhotoImage(LogoImg)
-#Logo = Label(ventana, width=300,height=80, image=LogoImg).place(x=469,y=20)
-"""
-LogoImg = PhotoImage(file="LogoTaller2.png")
-#LogoImg._
-canvas1 = Canvas(ventana)
-canvas1.pack(fill=BOTH)
-canvas1.create_image(0, 0, image=LogoImg, anchor=NW)
-canvas1.place(x=469,y=20)
-canvas1.size
-"""
-LogoImg = PhotoImage(file="LogoTaller2_2.png")
-Logo = Label(ventana, width=280,height=110, image=LogoImg).place(x=480,y=25)
 #Estado del programa --------------------
+Estatus = StringVar() #Para poder editar dinamicamente
+Estatus.set("Compilando...")
+Estado = Label(ventana, textvariable = Estatus, width=38, height=21, bg = "black", fg = "white").place(x=469,y=260)
 
-"""
-Estatus = 'Compilando...'
-EstadoEtiqueta = Message(ventana, text = "Estado:", width = 115, bg="#BEC7C9").place(x=17,y=440)
-Estado = Label(ventana, text = Estatus, width=95, height=5, bg = "black", fg = "white").place(x=17,y=490)
-"""
+#label.config(textvariable=texto)
+#palabra = "0xabFC450d"
+#numero = stringAHexa(palabra)
+#print(hex(numero))
+
 ventana.mainloop() #Corre la ventana
