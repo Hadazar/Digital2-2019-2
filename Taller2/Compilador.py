@@ -8,7 +8,7 @@ ventana = Tk() #Crea la ventana
 ventana.title("Compilador MIPS")
 ventana.geometry("800x600")
 ventana.resizable(0,0) #Bloquear el tamaño de la ventana
-ventana.configure(background="#B1C340")
+ventana.configure(background="#B1C340") #Color de fondo
 
 #Configuración de botones -------------
 ColorBoton=("#3FC3D8")
@@ -20,42 +20,32 @@ Tabla = open("InstruccionesMIPS","r")#Instrucciones tipo I y J
 SetInstrucciones = Tabla.read()
 TablaR = open("InstruccionesTipoR","r")#Instrucciones tipo R
 SetInstruccionesR = TablaR.read()
-BancoRegistros = open("BancoDeRegistros","r")
+BancoRegistros = open("BancoDeRegistros","r")#Banco de registros
 Registros = BancoRegistros.read()
-CodigoEjemplo = open("Ejemplo","r")
-Ejemplo = CodigoEjemplo.read()
+BancoRegistros = Registros.split(" ")#Vector que contiene los registros
 
-CodigoHexa = open("memfile.dat","w")
+CodigoHexa = open("memfile.dat","w")#Archivo sobre el cual se exporta el hexadecimal
+MatrizCodigo = []#Matriz que almacena el código escrito por el usuario
+Labels = {} #Diccionario para almacenar los label y sus direcciones de memoria
 
+DireccionBase = 0x00401000
+
+#Convierte un string en una matriz
 def convertirAmatriz(Texto):
-    Lista = Texto.split("\n")
+    Lista = Texto.split("\n")#Convierte el texto en un vector, cada vector es una línea de código
     n = len(Lista)
     Matriz = [None] * (n-1)
     for i in range(0,n-1):
-        Lista[i] = Lista[i].replace(",","")
-        Lista[i] = Lista[i].replace("("," ")
+        Lista[i] = Lista[i].replace(",","")#Suprime las comas
+        Lista[i] = Lista[i].replace("("," ")#Suprime los paréntesis
         Lista[i] = Lista[i].replace(")","")
-        Matriz[i] = Lista[i].split(" ")
+        Matriz[i] = Lista[i].split(" ") #Convierte cada línea de código en un vector, cada string es una posición
     return Matriz
 
-#MatrizCodigo = ""
-MatrizCodigo = convertirAmatriz(Ejemplo)
-Labels = {} #Se crea como un diccionario
-BancoRegistros = Registros.split(" ")
-DireccionBase = 0x00401000
-
+#Detecta los labels en el código, los almacena en un diccionario junto con sus respectivas posiciones de memoria, y los elimina de la matriz que contiene al código
 def capturarLabels():
-    global MatrizCodigo, Labels
-    n = len(MatrizCodigo)
-    """
-    for i in range(0,n-1):
-
-        if MatrizCodigo[i][0][-1] == ":":
-            label = MatrizCodigo[i][0].replace(":","")
-            Labels[label] = DireccionBase+i*4
-            MatrizCodigo.pop(i)
-            n = len(MatrizCodigo)-1
-    """
+    global MatrizCodigo, Labels #Se especifican globales, porque se pretende editar
+    n = len(MatrizCodigo) #Cantidad de líneas de código introducidas por el usuario
     i = 0
     while i<n:
         if MatrizCodigo[i][0][-1] == ":":
@@ -68,13 +58,9 @@ def capturarLabels():
 
 
 def exportar():
-    #print("Opcode: \n")
-    #print(SetInstrucciones)
-    capturarLabels()
-    imprimir(MatrizCodigo)
-    print("\n\n")
-    compilar()
-    print(MatrizHexa)
+    global CodigoHexa
+    CodigoHexa.write(MatrizHexa)
+    CodigoHexa.close()
     
     
 def capturarCodigo():
@@ -115,7 +101,7 @@ def buscarInstruccion(Matriz, Instruccion):
 #Matrices
 MatrizInstrucciones = convertirAmatriz(SetInstrucciones)
 MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
-MatrizHexa = ""
+MatrizHexa = "" #Matriz que almacenará el código hexadecimal
 
 #Botones -----------------------------
 Iniciar = Boton0=Button(ventana,text="Iniciar",bg=ColorBoton,width=AnchoBoton,height=AltoBoton,command=lambda:capturarCodigo()).place(x=17,y=17)
@@ -144,7 +130,7 @@ def compilar():
         DireccionInstruccion = DireccionBase + i*4
         InstruccionHexa = compilarInstruccion(Instruccion,DireccionInstruccion)
         Cadena = str(hex(int(InstruccionHexa))).replace("0x","") #Lo transforma en string y le quita el "0x"
-        Cadena = "0x" + Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
+        Cadena = Cadena.zfill(8) #Le añade ceros a la izquierda y le coloca de nuevo el "0x"
         MatrizHexa = MatrizHexa + Cadena + "\n"
 
 
