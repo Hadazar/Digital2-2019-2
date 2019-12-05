@@ -4,6 +4,8 @@ Tipo I: op rs rt imm
 	6  5  5  16
 Tipo J: op addr
 	6  26
+Tipo F: op cop ft fs fd func
+	6  5   5  5  5  6
 
 I1: rt rs imm
 I2: rt imm rs
@@ -19,4 +21,8 @@ R3: rd rt shamt
 R4: rs
 R5: rd
 R6: rs rt
+
+F1: fd fs ft
+F2: fd fs
+F3: fs ft
 

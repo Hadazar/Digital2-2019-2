@@ -1,0 +1,4 @@
+0x00400000
+add.s $fv0, $fv1, $ft3
+abs.s $ft4, $fs0
+c.le.d $fa1, $fs5

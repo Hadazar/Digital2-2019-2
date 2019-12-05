@@ -4,16 +4,21 @@ from math import *
 from random import randrange
 #from PIL import Image, ImageTk as itk
 
-#-----------------------BACK-END:PARTE FUNCIONAL DEL PROGRAMA---------------------------------
+#-----------------------BACK-END: PARTE FUNCIONAL DEL PROGRAMA---------------------------------
 
 #Tablas de instrucciones y registros MIPS
 Tabla = open("InstruccionesMIPS","r")#Instrucciones tipo I y J
 SetInstrucciones = Tabla.read()
 TablaR = open("InstruccionesTipoR","r")#Instrucciones tipo R
 SetInstruccionesR = TablaR.read()
+TablaF = open("InstruccionesTipoF","r")#Instrucciones tipo F
+SetInstruccionesF = TablaF.read()
 BancoRegistros = open("BancoDeRegistros","r")#Banco de registros
 Registros = BancoRegistros.read()
 BancoRegistros = Registros.split(" ")#Vector que contiene los registros
+BancoRegistrosF = open("BancoDeRegistrosF","r")#Banco de registros de punto flotante (tipo F)
+RegistrosF = BancoRegistrosF.read()
+BancoRegistrosF = RegistrosF.split(" ")#Vector que contiene los registros F
 
 MatrizCodigo = []#Matriz que almacena el código escrito por el usuario
 Labels = {} #Diccionario para almacenar los label y sus direcciones de memoria
@@ -34,6 +39,7 @@ def convertirAmatriz(Texto):
 #Matrices
 MatrizInstrucciones = convertirAmatriz(SetInstrucciones) #Tipo I y J
 MatrizInstruccionesR = convertirAmatriz(SetInstruccionesR)
+MatrizInstruccionesF = convertirAmatriz(SetInstruccionesF)
 MatrizHexa = "" #Matriz que almacenará el código hexadecimal
 
 #Borra el texto escrito por el usuario
@@ -73,10 +79,10 @@ def buscarInstruccion(Matriz, Instruccion):
     return EstructuraInstruccion #retorna un vector con la información de la instrución: Tipo de instrucción, opcode, func (para las tipo r) y al valor de algun registro (para algunas instrucciones especiales)
 
 #Encuentra el número que corresponde al registro
-def buscarRegistro(Registro):
+def buscarRegistro(Registro, Banco):
     NumeroRegistro = None
-    for i in range(len(BancoRegistros)):
-        if Registro == BancoRegistros[i]:
+    for i in range(len(Banco)):
+        if Registro == Banco[i]:
             NumeroRegistro = i
             break
     return NumeroRegistro
@@ -98,16 +104,24 @@ def capturarLabels():
 def compilarInstruccion(Instruccion,DireccionInstruccion):
 
     #Inicializa todas las variables necesarias para codificar las instrucciones
-    Opcode, rs, rt, rd, Shamt, Func, imm, addr = 0,0,0,0,0,0,0,0
+    Opcode, rs, rt, rd, Shamt, Func, imm, addr, cop, fd, fs, ft = 0,0,0,0,0,0,0,0,0,0,0,0
     InstruccionHexa = None #Variable para almacenar el hexadecimal de una instrucción
     Estructura = buscarInstruccion(MatrizInstrucciones, Instruccion[0])#Busca la información de la instrucción (opcode, tipo,...) en la lista tipo I y J
     TipoR = False #Bandera para indicar que no es tipo R
+    TipoF = False
 
-    #Si no las encuentra en la lista de tipo I y J entonces las busca en la lista tipoR
+    #Si no las encuentra en la lista de tipo I y J entonces las busca en la lista tipo R
     if Estructura == None:
         #print("buscando en R")
         Estructura = buscarInstruccion(MatrizInstruccionesR, Instruccion[0])
         TipoR = True #Bandera para indicar que es tipo R
+    
+    #Si tampoco las encuentra en la tipo R las busca en la tipo F
+    if Estructura == None:
+        #print("buscando en F")
+        Estructura = buscarInstruccion(MatrizInstruccionesF, Instruccion[0])
+        TipoR = False
+        TipoF = True #Bandera para indicar que es tipo R
 
     Tipo = Estructura[2] #Específica el tipo de instrucción
     #print("Tipo: ", Tipo)
@@ -122,22 +136,22 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo R1
         if Tipo == "R1":
-            rd = buscarRegistro(Instruccion[1]) 
-            rs = buscarRegistro(Instruccion[2]) 
-            rt = buscarRegistro(Instruccion[3])
+            rd = buscarRegistro(Instruccion[1], BancoRegistros) 
+            rs = buscarRegistro(Instruccion[2], BancoRegistros) 
+            rt = buscarRegistro(Instruccion[3], BancoRegistros)
             Shamt = 0
 
         #Tipo R2
         elif Tipo == "R2":
-            rd = buscarRegistro(Instruccion[1]) 
-            rt = buscarRegistro(Instruccion[2]) 
-            rs = buscarRegistro(Instruccion[3])
+            rd = buscarRegistro(Instruccion[1], BancoRegistros) 
+            rt = buscarRegistro(Instruccion[2], BancoRegistros) 
+            rs = buscarRegistro(Instruccion[3], BancoRegistros)
             Shamt = 0
 
         #Tipo R3
         elif Tipo == "R3":
-            rd = buscarRegistro(Instruccion[1]) 
-            rt = buscarRegistro(Instruccion[2]) 
+            rd = buscarRegistro(Instruccion[1], BancoRegistros) 
+            rt = buscarRegistro(Instruccion[2], BancoRegistros) 
             if Instruccion[3][0:2] == "0x" or  Instruccion[3][0:2] == "0X": #Si el imm esta escrito en hexadecimal
                 Shamt = stringAHexa(Instruccion[3])
             else: Shamt = int(Instruccion[3])  #Si el imm esta escrito en decimal
@@ -145,22 +159,22 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo R4
         elif Tipo == "R4":
-            rs = buscarRegistro(Instruccion[1])
+            rs = buscarRegistro(Instruccion[1], BancoRegistros)
             rt = 0
             rd = 0
             Shamt = 0
 
         #Tipo R5
         elif Tipo == "R5":
-            rd = buscarRegistro(Instruccion[1])
+            rd = buscarRegistro(Instruccion[1], BancoRegistros)
             rt = 0
             rs = 0
             Shamt = 0
 
         #Tipo R6
         elif Tipo == "R6":
-            rs = buscarRegistro(Instruccion[1])
-            rt = buscarRegistro(Instruccion[2])
+            rs = buscarRegistro(Instruccion[1], BancoRegistros)
+            rt = buscarRegistro(Instruccion[2], BancoRegistros)
             rd = 0
             Shamt = 0
 
@@ -178,8 +192,44 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         #print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
         #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
+    #Si la instrucción es tipo F:
+    elif TipoF == True:
+
+        Opcode = 17 #El opcode siempre es cero para las tipo R
+        Func = int(Estructura[1])
+        cop = int(Estructura[3]) #Precisión de la instrucción: single o double
+
+        #Tipo F1
+        if Tipo == "F1":
+            fd = 2 * buscarRegistro(Instruccion[1], BancoRegistrosF) #Los registros F estan númerados de dos en dos
+            fs = 2 * buscarRegistro(Instruccion[2], BancoRegistrosF)
+            ft = 2 * buscarRegistro(Instruccion[3], BancoRegistrosF)
+
+        #Tipo F2
+        if Tipo == "F2":
+            fd = 2 * buscarRegistro(Instruccion[1], BancoRegistrosF)
+            fs = 2 * buscarRegistro(Instruccion[2], BancoRegistrosF)
+            ft = 0
+
+        #Tipo F3
+        if Tipo == "F3":
+            fs = 2 * buscarRegistro(Instruccion[1], BancoRegistrosF)
+            ft = 2 * buscarRegistro(Instruccion[2], BancoRegistrosF)
+            fd = 0
+        
+        InstruccionHexa= Func + fd*pow(2,6) + fs*pow(2,11) + ft*pow(2,16) + cop*pow(2,21) + Opcode*pow(2,26)
+                    # op cop ft fs fd func
+                    #  6  5  5  5  5  6
+                    # 26 =5 +5 +5 +5  +6  => op*2^26
+                    #    21= 5 +5 +5  +6  => cop*2^21
+                    #       16= 5 +5  +6  => ft*2^16
+                    #          11= 5  +6  => fs*2^11
+                    #                  6  => fd*2^6
+                    #                     => func
+        #print("op: ",Opcode,", fs: ",fs,", ft: ",ft,", fd: ",fd,", cop: ",cop,"\n")
+
     #Si la instruccion es tipo I o J:
-    elif TipoR == False:
+    else:
 
         Opcode = int(Estructura[1])
         TipoJ = False #Bandera para indicar que no es tipo J
@@ -190,12 +240,12 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         if Tipo == "J":
             addr = Labels[Instruccion[1]]/4 #La dirección del label quitandole dos ceros a la derecha
             print(addr)
-            TipoJ = True #Bandera para indicar que no es tipo J
+            TipoJ = True #Bandera para indicar que si es tipo J
 
         #Tipo I1
         elif Tipo == "I1":
-            rt = buscarRegistro(Instruccion[1])
-            rs = buscarRegistro(Instruccion[2])
+            rt = buscarRegistro(Instruccion[1], BancoRegistros)
+            rs = buscarRegistro(Instruccion[2], BancoRegistros)
             #Si el imm esta escrito en hexadecimal
             if Instruccion[3][0:2] == "0x" or  Instruccion[3][0:2] == "0X":
                 imm = stringAHexa(Instruccion[3])
@@ -203,27 +253,27 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo I2
         elif Tipo == "I2":
-            rt = buscarRegistro(Instruccion[1])
+            rt = buscarRegistro(Instruccion[1], BancoRegistros)
             if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
                 imm = stringAHexa(Instruccion[2])
             else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
-            rs = buscarRegistro(Instruccion[3])
+            rs = buscarRegistro(Instruccion[3], BancoRegistros)
 
         #Tipo I3
         elif Tipo == "I3":
-            rs = buscarRegistro(Instruccion[1])
+            rs = buscarRegistro(Instruccion[1], BancoRegistros)
             imm = (Labels[Instruccion[2]] - (DireccionInstruccion+4))/4 #Cantidad de líneas de código que debe saltar el pc para llegar al label
             rt = int(Estructura[3]) #Para este tipo de instrucción el rt viene con un valor por defecto
 
         #Tipo I4
         elif Tipo == "I4":
-            rs = buscarRegistro(Instruccion[1])
-            rt = buscarRegistro(Instruccion[2])
+            rs = buscarRegistro(Instruccion[1], BancoRegistros)
+            rt = buscarRegistro(Instruccion[2], BancoRegistros)
             imm = (Labels[Instruccion[3]] - (DireccionInstruccion+4))/4 
 
         #Tipo I5
         elif Tipo == "I5":
-            rt = buscarRegistro(Instruccion[1])
+            rt = buscarRegistro(Instruccion[1], BancoRegistros)
             if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
                 imm = stringAHexa(Instruccion[2])
             else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
@@ -231,8 +281,8 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
 
         #Tipo I6
         elif Tipo == "I6":
-            rt = buscarRegistro(Instruccion[1])
-            rd = buscarRegistro(Instruccion[2])
+            rt = buscarRegistro(Instruccion[1], BancoRegistros)
+            rd = buscarRegistro(Instruccion[2], BancoRegistros)
             rs = int(Estructura[3])
 
         #Tipo I7
@@ -273,7 +323,7 @@ def compilar():
     MatrizHexa = "" #Vacia la matriz
     n = len(MatrizCodigo)
 
-    Estatus.set(Estatus.get() + "\n" + "Dirección:          " + "Instruccion:\n")
+    Estatus.set(Estatus.get() + "\n" + "Dirección:          " + "Instrucción:\n")
 
     for i in range(len(MatrizCodigo)):
 
@@ -331,6 +381,19 @@ def capturarCodigo():
     capturarLabels()
     compilar()
 
+def extraerEjemplo():
+    NumeroAleatorio = randrange(6)+1 #Número de 0 a 6
+    NumeroAleatorio = str(NumeroAleatorio)
+    Ubicacion = "Ejemplos/" + NumeroAleatorio #Ruta del ejemplo
+    Ejemplo = open(Ubicacion,"r")
+    Ejemplo = Ejemplo.read()
+    Ejemplo = Ejemplo.strip() #Elimina el salto de línea al final del txt
+    DireccionEjemplo = Ejemplo[0:10] #Dirección base del ejemplo
+    Ejemplo = Ejemplo.replace(DireccionEjemplo + "\n","") #Quita la dirección del txt
+    CuadroDireccion.delete(1.0,END) #Borra el contenido del cuadro de texto de dirección
+    borrar() #Borra el contenido del cuadro de código assembler
+    CuadroDireccion.insert(END,DireccionEjemplo) #Inserta la dirección del ejemplo en la interfaz
+    CodigoMips.insert(END,Ejemplo) #Inserta el código del ejemplo en la interfaz
 
 #-----------------------FRONT-END:INTERFAZ GRÁFICA---------------------------------
 
@@ -383,24 +446,10 @@ CodigoMips = Text(ventana,width=35,height=20, padx = 10, pady = 10) #Cuadro de t
 CodigoMips.place(x=25,y=260)
 
 #Estado del programa --------------------
-Estatus = StringVar() #Para poder editar dinamicamente
+Estatus = StringVar() #Para poder editar dinámicamente
 Estatus.set("\nEstado: Esperando a que el usuario pulse iniciar para realizar compilación...")
 Estado = Label(ventana, textvariable = Estatus, width=35, height=20, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
 
-
-def extraerEjemplo():
-    NumeroAleatorio = randrange(3)+1
-    NumeroAleatorio = str(NumeroAleatorio)
-    Ubicacion = "Ejemplos/" + NumeroAleatorio
-    Ejemplo = open(Ubicacion,"r")
-    Ejemplo = Ejemplo.read()
-    Ejemplo = Ejemplo.strip()
-    DireccionEjemplo = Ejemplo[0:10]
-    Ejemplo = Ejemplo.replace(DireccionEjemplo + "\n","")
-    CuadroDireccion.delete(1.0,END)
-    borrar()
-    CuadroDireccion.insert(END,DireccionEjemplo)
-    CodigoMips.insert(END,Ejemplo)
     
 #extraerEjemplo()
 
