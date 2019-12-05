@@ -178,6 +178,15 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             rd = 0
             Shamt = 0
 
+        #Tipo R+
+        elif Tipo == "R+":
+            rs = buscarRegistro(Instruccion[1], BancoRegistros)
+            rt = buscarRegistro(Instruccion[2], BancoRegistros)
+            rd = buscarRegistro(Instruccion[3], BancoRegistros)
+            Shamt = 0
+            Opcode = int(Estructura[1])
+            Func = int(Estructura[3])
+
         #Multiplica cada parte de la instrucción por su respectiva potencia de dos y suma, así construye la instrucción completa
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
                     # op rs rt rd shamt func
@@ -189,7 +198,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
                     #                      6  => shamt*2^6
                     #                         => func
 
-        #print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
+        print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
         #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     #Si la instrucción es tipo F:
@@ -450,7 +459,5 @@ Estatus = StringVar() #Para poder editar dinámicamente
 Estatus.set("\nEstado: Esperando a que el usuario pulse iniciar para realizar compilación...")
 Estado = Label(ventana, textvariable = Estatus, width=35, height=20, bg = "black", fg = "white", justify = "left", anchor = "n", padx = 10, pady = 10, wraplength = 300).place(x=469,y=260)
 
-    
-#extraerEjemplo()
 
 ventana.mainloop() #Corre la ventana
