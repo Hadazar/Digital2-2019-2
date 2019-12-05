@@ -182,7 +182,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         elif Tipo == "R+":
             rs = buscarRegistro(Instruccion[1], BancoRegistros)
             rt = buscarRegistro(Instruccion[2], BancoRegistros)
-            rd = buscarRegistro(Instruccion[3], BancoRegistros)
+            rd = 0
             Shamt = 0
             Opcode = int(Estructura[1])
             Func = int(Estructura[3])
