@@ -25,3 +25,5 @@ nor 39 R1
 slt 42 R1
 sltu 43 R1
 mul 28 R+ 2
+syscall 12 R-
+break 13 R-

@@ -1,3 +1,5 @@
 0x00400000
 lwc1 $ft0, 8($t0)
 swc1 $ft5, 0xA($t2)
+syscall
+break

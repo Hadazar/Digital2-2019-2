@@ -187,6 +187,13 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
             Opcode = int(Estructura[1])
             Func = int(Estructura[3])
 
+        #Tipo R-
+        elif Tipo == "R-":
+            rs = 0
+            rt = 0
+            rd = 0
+            Shamt = 0
+
         #Multiplica cada parte de la instrucción por su respectiva potencia de dos y suma, así construye la instrucción completa
         InstruccionHexa= Func + Shamt*pow(2,6) + rd*pow(2,11) + rt*pow(2,16) + rs*pow(2,21) + Opcode*pow(2,26)
                     # op rs rt rd shamt func
