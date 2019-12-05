@@ -18,7 +18,6 @@ mfc0 16 I6 0
 mtc0 16 I6 4
 bc1f 17 I7 0
 bc1t 17 I7 1
-mul 28 R+ 2
 lb 32 I2
 lh 33 I2
 lw 35 I2
@@ -27,3 +26,5 @@ lhu 37 I2
 sb 40 I2
 sh 41 I2
 sw 43 I2
+lwc1 49 I+
+swc1 56 I+

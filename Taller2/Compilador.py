@@ -198,7 +198,7 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
                     #                      6  => shamt*2^6
                     #                         => func
 
-        print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
+        #print("op: ",Opcode,", rs: ",rs,", rt: ",rt,", rd: ",rd,", shamt: ",Shamt,"\n")
         #print("Hexa: ",hex(int(InstruccionHexa)),"\n")
 
     #Si la instrucción es tipo F:
@@ -263,6 +263,14 @@ def compilarInstruccion(Instruccion,DireccionInstruccion):
         #Tipo I2
         elif Tipo == "I2":
             rt = buscarRegistro(Instruccion[1], BancoRegistros)
+            if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
+                imm = stringAHexa(Instruccion[2])
+            else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
+            rs = buscarRegistro(Instruccion[3], BancoRegistros)
+
+        #Tipo I+
+        elif Tipo == "I+":
+            rt = 2 * buscarRegistro(Instruccion[1], BancoRegistrosF) #debería ser ft, pero se dejó rt para ser consistente con las otras instrucciones tipo I
             if Instruccion[2][0:2] == "0x" or  Instruccion[2][0:2] == "0X": #Si el imm esta escrito en hexadecimal
                 imm = stringAHexa(Instruccion[2])
             else: imm = int(Instruccion[2])  #Si el imm esta escrito en decimal
@@ -391,7 +399,7 @@ def capturarCodigo():
     compilar()
 
 def extraerEjemplo():
-    NumeroAleatorio = randrange(6)+1 #Número de 0 a 6
+    NumeroAleatorio = randrange(7)+1 #Número de 0 a 7(hay 7 ejemplos)
     NumeroAleatorio = str(NumeroAleatorio)
     Ubicacion = "Ejemplos/" + NumeroAleatorio #Ruta del ejemplo
     Ejemplo = open(Ubicacion,"r")

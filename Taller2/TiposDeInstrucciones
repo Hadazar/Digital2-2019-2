@@ -9,6 +9,7 @@ Tipo F: op cop ft fs fd func
 
 I1: rt rs imm
 I2: rt imm rs
+I+: ft imm rs
 I3: rs label rt=0/1
 I4: rs rt label
 I5: rt imm
@@ -21,6 +22,7 @@ R3: rd rt shamt
 R4: rs
 R5: rd
 R6: rs rt
+R+: rd rs rt func=2 opcode=28
 
 F1: fd fs ft
 F2: fd fs
