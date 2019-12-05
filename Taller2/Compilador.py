@@ -458,6 +458,7 @@ CuadroExportacionEtiqueta = Message(ventana, text = "Inserte el nombre del archi
 CuadroExportacion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
 CuadroExportacion.place(x=25,y=60)
 CuadroExportacion.insert(END,"memfile")
+
 #Dirección base
 CuadroDireccionEtiqueta = Message(ventana, text = "Inserte dirección inicial:", width = 300, bg="#BEC7C9").place(x=25,y=120)
 CuadroDireccion = Text(ventana,width=35,height=1, padx = 10, pady = 10)
@@ -466,7 +467,7 @@ CuadroDireccion.insert(END,"0x00400000")
 
 #Código MIPS ---------------------------
 CodigoMipsEtiqueta = Message(ventana, text = "Escriba su código MIPS aquí:", width = 300, bg="#BEC7C9").place(x=25,y=220)
-CodigoMips = Text(ventana,width=35,height=20, padx = 10, pady = 10) #Cuadro de texto para que el usuario escriba el código
+CodigoMips = Text(ventana,width=33,height=19, padx = 20, pady = 20) #Cuadro de texto para que el usuario escriba el código
 CodigoMips.place(x=25,y=260)
 
 #Estado del programa --------------------
