@@ -1,0 +1,26 @@
+NET "serial_tx" LOC=D4 | IOSTANDARD=LVCMOS33; # serial:0.tx
+NET "serial_rx" LOC=C4 | IOSTANDARD=LVCMOS33; # serial:0.rx
+NET "clk100" LOC=E3 | IOSTANDARD=LVCMOS33; # clk100:0
+NET "cpu_reset" LOC=C12 | IOSTANDARD=LVCMOS33; # cpu_reset:0
+NET "boton0" LOC=G16 | IOSTANDARD=LVCMOS33; # boton:0
+NET "boton1" LOC=F16 | IOSTANDARD=LVCMOS33; # boton:1
+NET "boton2" LOC=D14 | IOSTANDARD=LVCMOS33; # boton:2
+NET "boton3" LOC=H14 | IOSTANDARD=LVCMOS33; # boton:3
+NET "boton4" LOC=G13 | IOSTANDARD=LVCMOS33; # boton:4
+NET "boton5" LOC=F13 | IOSTANDARD=LVCMOS33; # boton:5
+NET "boton6" LOC=E16 | IOSTANDARD=LVCMOS33; # boton:6
+NET "boton7" LOC=H16 | IOSTANDARD=LVCMOS33; # boton:7
+NET "lcd_spi_cs_n" LOC=C17 | IOSTANDARD=LVCMOS33; # lcd_spi:0.cs_n
+NET "lcd_spi_mosi" LOC=G17 | IOSTANDARD=LVCMOS33; # lcd_spi:0.mosi
+NET "lcd_spi_miso" LOC=E17 | IOSTANDARD=LVCMOS33; # lcd_spi:0.miso
+NET "lcd_spi_clk" LOC=D17 | IOSTANDARD=LVCMOS33; # lcd_spi:0.clk
+NET "rs_lcd" LOC=E18 | IOSTANDARD=LVCMOS33; # rs_lcd:0
+NET "rst_lcd" LOC=D18 | IOSTANDARD=LVCMOS33; # rst_lcd:0
+NET "sd_spi_cs_n" LOC=K1 | IOSTANDARD=LVCMOS33; # sd_spi:0.cs_n
+NET "sd_spi_mosi" LOC=F6 | IOSTANDARD=LVCMOS33; # sd_spi:0.mosi
+NET "sd_spi_miso" LOC=J2 | IOSTANDARD=LVCMOS33; # sd_spi:0.miso
+NET "sd_spi_clk" LOC=G6 | IOSTANDARD=LVCMOS33; # sd_spi:0.clk
+
+
+NET "clk100" TNM_NET = "PRDclk100";
+TIMESPEC "TSclk100" = PERIOD "PRDclk100" 10.0 ns HIGH 50%;
