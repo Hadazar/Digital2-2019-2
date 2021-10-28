@@ -1,7 +1,0 @@
-INFILE=/home/hector/Escritorio/Digital2-2019-2/final_1/build/gateware/top.ncd
-OUTFILE=/home/hector/Escritorio/Digital2-2019-2/final_1/build/gateware/top.bit
-FAMILY=Artix7
-PART=xc7a100t-1csg324
-WORKINGDIR=/home/hector/Escritorio/Digital2-2019-2/final_1/build/gateware
-LICENSE=WebPack
-USER_INFO=211483832_0_0_073
